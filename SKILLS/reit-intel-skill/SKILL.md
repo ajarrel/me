@@ -1,399 +1,487 @@
 ---
 name: self-storage-reit-intel
 description: >
-  Public REIT earnings intelligence for self-storage owner-operators. Trigger whenever
-  the user asks about REIT results, public storage company performance, what the big
-  operators reported, how REITs are doing, REIT earnings calls, sector benchmarks,
-  competitor operator intelligence, or anything like "what are the REITs saying" or
-  "how did Extra Space / Public Storage / CubeSmart / NSA / SmartStop do." Also trigger
-  proactively when the user is preparing for an investor presentation, speaking
-  engagement, ownership update, or deal-underwriting context where REIT sector
-  benchmarks would be relevant. Produces an investor-grade brief covering the most
-  recent 5 quarters of REIT results with sequential + YoY trend deltas, cross-REIT
-  dispersion stats, NC-flagged commentary, forward guidance, and an NC operator
-  intelligence section on practices and technologies worth adopting.
+  Public self-storage REIT earnings intelligence for owner-operators, investors,
+  lenders, and market analysts. Trigger whenever the user asks about public storage
+  company results, operator earnings, REIT earnings calls, sector benchmarks,
+  competitor operator intelligence, forward guidance, or anything like "what are
+  public operators saying" or "how did the storage REITs do." Also trigger
+  proactively when the user is preparing for an investor presentation, ownership
+  update, board package, lender discussion, market planning, or deal-underwriting
+  context where public operator benchmarks would be useful. On first run, establish
+  the user's organization profile, target markets, submarkets, and relevant peer
+  set before doing data work.
 ---
- 
+
 # Self-Storage REIT Intelligence Skill
- 
-Produces an investor-grade, slide-deck-ready earnings brief covering the **most recent 5 quarters**
-of public self-storage REIT results, with a **North Carolina regional operator lens** for ASSI.
- 
+
+Produces an investor-grade, slide-deck-ready earnings brief covering the **most recent
+reported quarters** of public self-storage REIT results, translated into the user's
+configured market and operating context.
+
 Default output: **interactive widget dashboard + markdown brief file**. Both render in one run.
- 
+
 ---
- 
+
+## First-Run Market Setup
+
+Before any earnings research, determine whether a reusable **Market Profile** exists in
+the conversation, user-provided files, or prior run output. If no profile exists, pause
+and ask the user to establish it. Do not assume a company, state, region, portfolio size,
+submarket list, or peer set.
+
+Ask for the minimum setup needed to make the brief useful:
+
+1. **Organization label**: company name, portfolio name, or neutral label to use in callouts.
+2. **Primary geography**: state, region, country, or national lens.
+3. **Target markets and submarkets**: MSAs, counties, cities, trade areas, corridors, or
+   named operating clusters the brief should map back to.
+4. **Portfolio context**: approximate facility count, operating model, customer type, and
+   any known strengths or constraints.
+5. **Priority questions**: rate posture, occupancy pressure, supply pipeline, demand
+   drivers, technology adoption, expense control, acquisitions, lending, or budget planning.
+6. **Peer emphasis**: all public self-storage REITs by default, or a user-specified subset
+   of operators/tickers.
+
+After setup, restate the profile as JSON so it can be reused:
+
+```json
+{
+  "organization_label": "",
+  "primary_geography": "",
+  "markets": [
+    {
+      "name": "",
+      "submarkets": [],
+      "notes": ""
+    }
+  ],
+  "portfolio_context": "",
+  "priority_questions": [],
+  "peer_emphasis": "all current public self-storage REITs"
+}
+```
+
+If the user says to proceed without setup, use a **national, investor-neutral lens** and
+state that no market-specific read-through is available.
+
+---
+
 ## Scope Parameters (set at start of run)
- 
-Fill these in explicitly at the top of the response before any data work. If the user didn't
-specify a value, use the default and state the assumption.
- 
+
+Fill these in explicitly at the top of the response before any data work. If the user
+doesn't specify a value, use the default and state the assumption.
+
 | Parameter | Default | Notes |
 |---|---|---|
-| `horizon` | 5 quarters (current + 4 trailing) | User can override (e.g. 8 quarters for a longer-cycle view) |
-| `reit_set` | Core 5: PSA, EXR, CUBE, NSA, SMA | Drop NSA once PSA acquisition closes |
-| `lens` | NC / Southeast | Alternatives: "Sun Belt broad", "national", "investor-neutral" |
+| `horizon` | 5 reported quarters | User can override, e.g. 8 quarters for longer-cycle view |
+| `peer_set` | Current public self-storage REITs | Confirm current tickers at run time; user can supply a subset |
+| `market_profile` | User-configured profile | If missing, run First-Run Market Setup before proceeding |
+| `lens` | Market-profile lens | Alternatives: national, regional, investor-neutral, lender, board |
 | `output` | Widget + `.md` brief | Alternatives: widget only, `.md` only, + `.pptx` |
-| `audience` | ASSI ownership group | Alternatives: "external investor", "lender", "board" |
- 
+| `audience` | Market-profile audience | Alternatives: ownership group, external investor, lender, board |
+
 State the parameter block in the first line of the response. Example:
- 
-> **Scope:** 5 quarters (Q4'24 → Q4'25), PSA/EXR/CUBE/NSA/SMA, NC-Southeast lens, widget + .md, ASSI ownership audience.
- 
+
+> **Scope:** 5 reported quarters, current public self-storage REIT peer set, configured market-profile lens, widget + .md, ownership audience.
+
 ---
- 
-## Covered REITs (Core Set)
- 
-| Ticker | Company | Notes |
-|--------|---------|-------|
-| PSA | Public Storage | Largest by unit count; bellwether for sector commentary |
-| EXR | Extra Space Storage | Largest by facility count post-LSI merger; heavy 3rd-party mgmt |
-| CUBE | CubeSmart | Most NYC/Boston-concentrated; most urban portfolio |
-| NSA | National Storage Affiliates Trust | **Pending acquisition by PSA** (announced early 2026 at ~$41.68/share); guidance interpretation should flag this |
-| SMA | SmartStop Self Storage | IPO'd April 2025; smallest of the five but tech-forward; explicit AI/automation positioning |
- 
-**Drop criteria:** If a REIT is acquired and stops filing quarterly, drop from core set and note in scope block. If a new self-storage REIT IPOs and has 2+ quarters of public filings, add to core set.
- 
+
+## Covered Public Operators
+
+Build the peer set dynamically at run time:
+
+1. Identify all currently public self-storage REITs or public owner-operators that report
+   comparable quarterly self-storage metrics.
+2. Include any user-specified operators/tickers even if they are not REITs, but label them
+   separately if comparability is limited.
+3. Drop companies that have been acquired, delisted, or stopped reporting comparable
+   quarterly metrics, and note the change in the scope block.
+4. Add newly public operators once they have at least two quarters of public filings.
+
+Do not hard-code a permanent peer set. Public operator availability changes over time.
+
 ---
- 
+
 ## Workflow
- 
-### Step 1 — Determine Reporting Window
- 
-Today's date is known from the system prompt. Identify the 5 most recently **reported** quarters.
- 
+
+### Step 1 - Determine Reporting Window
+
+Today's date is known from the system prompt. Identify the most recently **reported**
+quarters in the requested horizon.
+
 Quarter reporting calendar:
 - Q1 closes Mar 31; reports late Apr / early May
 - Q2 closes Jun 30; reports early Aug
 - Q3 closes Sep 30; reports early Nov
-- Q4 closes Dec 31; reports mid-to-late Feb (next year)
-Confirm timing with one search before committing the window:
- 
-```
-web_search: "self storage REIT earnings most recent quarter results [year]"
-```
- 
-If the current date falls inside a reporting window (e.g. mid-Feb, early May), check whether all five REITs have reported yet. If not all five have reported, either (a) wait for completeness if user can delay, or (b) mark the missing REIT's most recent quarter as "pending" and proceed with the other four.
- 
-### Step 2 — Gather Data (Structured Collection Table)
- 
-For each of the 5 REITs × 5 quarters, fill the collection table below **before rendering any output**. This forces completeness and prevents the "I'll just run a search and see what comes back" failure mode.
- 
+- Q4 closes Dec 31; reports mid-to-late Feb of the following year
+
+Confirm timing and the currently active public peer set with current sources before
+committing the window.
+
+If the current date falls inside a reporting window, check whether all selected peers have
+reported. If not, either ask whether the user wants to wait for completeness or mark the
+missing peer's most recent quarter as "pending" and proceed with the available reports.
+
+### Step 2 - Gather Data (Structured Collection Table)
+
+For each selected public operator and each quarter in the horizon, fill the collection
+table below **before rendering any output**. This forces completeness and prevents
+under-sourced narrative.
+
 Data collection priority order:
-1. Company IR press releases / 8-K filings (SEC EDGAR direct)
-2. InsideSelfStorage.com quarterly recap articles
-3. SkyView Advisors quarterly industry reports
-4. Earnings call transcripts (Motley Fool, Seeking Alpha, Fintool)
-5. Yardi Matrix / StorTrack sector reports (for regional context)
-**Per-REIT per-quarter data points:**
- 
+1. Company investor-relations releases and SEC filings
+2. Earnings call transcripts
+3. Reputable industry recaps and quarterly sector reports
+4. Market and supply reports for the configured geographies
+
+**Per-operator per-quarter data points:**
+
 | Core metrics | Notes |
 |---|---|
-| Same-store ending occupancy (%) | Stated period-end figure; NOT average |
-| Same-store revenue Δ YoY (%) | One decimal precision |
-| Same-store opex Δ YoY (%) | One decimal precision |
-| Same-store NOI Δ YoY (%) | One decimal precision |
-| Core FFO per share ($) | As-reported |
-| Core FFO Δ YoY (%) | Computed if not stated |
-| **RevPAF or Rev/Occ sq ft** | Revenue per available square foot OR per occupied sq ft — state which |
-| **Achieved rate vs. asking rate** | If disclosed; spread indicates discount/concession pressure |
-| **Move-in rate Δ YoY (%)** | Leading indicator for next-quarter revenue |
-| **ECRI contribution to revenue** | % points of revenue growth from existing-customer rate increases |
- 
-**Per-REIT commentary capture:**
-- New supply / construction pipeline commentary (national + any regional detail)
-- Market callouts (flag NC/Southeast/Sun Belt separately from CA/NYC/etc.)
-- Technology / operational initiatives mentioned
-- Pricing strategy language (ECRI cadence, concession philosophy, move-in rate direction)
-- Demand driver framing (housing turnover, migration, rates)
+| Same-store ending occupancy (%) | Stated period-end figure; not average |
+| Same-store revenue change YoY (%) | One decimal precision |
+| Same-store opex change YoY (%) | One decimal precision |
+| Same-store NOI change YoY (%) | One decimal precision |
+| Core FFO per share or equivalent | Use company-defined metric and label it |
+| Core FFO change YoY (%) | Compute if not stated and inputs are available |
+| RevPAF or revenue per occupied square foot | State which measure is used |
+| Achieved rate vs. asking rate | If disclosed; spread indicates concession pressure |
+| Move-in rate change YoY (%) | Leading indicator for future revenue |
+| ECRI contribution to revenue | If disclosed; label as percentage points or percent |
+
+**Per-operator commentary capture:**
+- New supply / construction pipeline commentary, national and market-specific
+- Market callouts that overlap with the user's configured markets
+- Technology and operational initiatives
+- Pricing strategy language, including ECRI cadence, concessions, and move-in rates
+- Demand driver framing, including housing turnover, migration, rates, and local economy
+
 **For the most recent quarter only:**
-- Full-year forward guidance (SS revenue, expense, NOI ranges + midpoints, Core FFO range + midpoint)
-- Management tone indicators (phrases like "remain cautious," "encouraged by," "stabilization," "bottoming")
-**For the fifth-oldest quarter in the horizon:**
-- What they guided for the full year at that time (needed for Step 4 guidance tracking)
-### Step 3 — Compute Derived Metrics
- 
+- Full-year forward guidance where available
+- Management tone indicators
+
+**For the fifth-oldest quarter or first quarter in the horizon:**
+- Initial full-year guidance from that period when available, for guidance accuracy tracking
+
+### Step 3 - Compute Derived Metrics
+
 After collecting raw data, compute:
- 
-1. **Sequential Δ (QoQ)** for every metric — direction arrow + magnitude
-   - ↑ = improved vs prior quarter
-   - ↓ = deteriorated vs prior quarter
-   - → = flat (within ±10 bps for occupancy, ±0.2% for growth metrics)
-2. **5-quarter trajectory** — one of: Accelerating / Stabilizing / Decelerating / Choppy / Bottoming
-   - Look at the direction of change across all 5 quarters, not just endpoints
-3. **Cross-REIT dispersion per metric per quarter:**
-   - Median across the 5 REITs
-   - Range (high − low)
-   - Standard deviation (useful for "is the sector moving in unison?")
+
+1. **Sequential change (QoQ)** for every metric: direction arrow + magnitude.
+   - Up = improved vs. prior quarter
+   - Down = deteriorated vs. prior quarter
+   - Flat = within +/-10 bps for occupancy or +/-0.2% for growth metrics
+2. **Horizon trajectory**: Accelerating / Stabilizing / Decelerating / Choppy / Bottoming.
+3. **Cross-peer dispersion per metric per quarter:**
+   - Median
+   - Range (high minus low)
+   - Standard deviation
 4. **Consensus call** for each quarter:
-   - "Consensus" = 4 of 5 REITs moving in the same direction
-   - "Split" = 3-2 or 2-2-1 direction mix
+   - "Consensus" = at least 80% of peers moving in the same direction
+   - "Split" = a visible majority but not 80%
    - "Divergent" = no clear majority
-### Step 4 — Guidance Accuracy Tracking (Persistent)
- 
-For each REIT, compare:
- 
+
+### Step 4 - Guidance Accuracy Tracking
+
+For each peer, compare initial guidance to actual results:
+
 | Score | Criterion |
 |---|---|
-| ✅ Beat | Full-year actual exceeded guidance midpoint issued at start of year |
-| ➖ Met | Within ±25 bps of midpoint |
-| ⚠️ Missed (soft) | 25–75 bps below midpoint |
-| ❌ Missed (hard) | More than 75 bps below midpoint |
- 
-Score both the **most recent completed year** and the **prior year** so the brief can show who is chronically optimistic vs. conservative. A single data point is anecdote; two is pattern.
- 
-Flag any REIT that has revised guidance mid-year (typically after Q2 or Q3 prints) — this is a meaningful signal.
- 
-### Step 5 — NC Relevance Filter
- 
-Apply to all commentary:
- 
-**Flag as NC-relevant (include in NC Intel section):**
-- Direct mentions: Sunbelt, Southeast, Mid-Atlantic, Carolinas, NC, Raleigh, Charlotte, Research Triangle, Triad, Wilmington
-- MSA-level: Any Top-50 MSA named that applies regionally (Charlotte-Concord MSA, Raleigh-Cary MSA, Durham-Chapel Hill MSA, Greensboro-High Point MSA, Winston-Salem MSA, Fayetteville MSA, Wilmington MSA)
-- Supply pipeline trends affecting Sun Belt / Southeast
-- Demand drivers tied to Southeast migration / housing turnover
-- Technology rollouts applicable to regional operators (AI pricing, digital marketing, automation)
-- Platform-agnostic operational practices (expense control, insurance, property taxes, tenant protection plan penetration)
-- Pricing strategy shifts (ECRI cadence, concession philosophy)
-**Note but don't spotlight (Immaterial Flags):**
-- CA rent control / LA state-of-emergency rent restrictions
-- NYC / Boston / DC supply-constrained premium market commentary
-- West Coast or Northeast-specific market dynamics
-- REIT-specific capital structure (bond issuances, JV structures) unless it signals industry trend
-### Step 6 — Render Output
- 
-Render **both** deliverables in one run:
-1. Interactive widget dashboard via `show_widget`
-2. Markdown brief file saved to `/mnt/user-data/outputs/` and surfaced via `present_files`
-Offer (do not auto-produce) a `.pptx` slide version if the user wants it for an upcoming presentation.
- 
+| Beat | Full-year actual exceeded guidance midpoint issued at start of year |
+| Met | Within +/-25 bps of midpoint |
+| Missed (soft) | 25-75 bps below midpoint |
+| Missed (hard) | More than 75 bps below midpoint |
+
+Score both the **most recent completed year** and the **prior year** when available so the
+brief can distinguish optimistic, conservative, accurate, and volatile forecasters.
+
+Flag any operator that revised guidance mid-year, because that changes how heavily its
+current guidance should be weighted.
+
+### Step 5 - Market Relevance Filter
+
+Apply the user's Market Profile to all commentary.
+
+**Flag as market-relevant:**
+- Direct mentions of configured states, regions, MSAs, counties, cities, submarkets, or
+  trade areas
+- Comparable adjacent regions or market types when direct mentions are unavailable
+- Supply pipeline trends affecting the configured markets or similar growth profiles
+- Demand drivers tied to the configured markets
+- Technology rollouts applicable to the user's operating model
+- Platform-agnostic operational practices such as expense control, insurance, property
+  taxes, tenant protection, delinquency management, and staffing model
+- Pricing strategy shifts that could affect local rate posture
+
+**Note but do not spotlight:**
+- Geography-specific regulation or supply dynamics outside the configured markets unless
+  they signal a broader industry trend
+- Capital markets events unless they affect guidance, acquisition appetite, or operating
+  strategy relevant to the user
+
+### Step 6 - Render Output
+
+Render both deliverables in one run when tooling supports it:
+1. Interactive widget dashboard
+2. Markdown brief file saved to the available output directory and surfaced to the user
+
+Offer, but do not auto-produce, a slide version if the user wants it for a presentation.
+
 ---
- 
+
 ## Output Format
- 
-The brief has **seven sections**. Always produce all seven. Each section ends with a **"So What for ASSI"** single-sentence callout that synthesizes the section for a 20-facility NC operator.
- 
+
+The brief has **seven sections**. Always produce all seven. Each section ends with a
+single-sentence **"So What"** callout that synthesizes the section for the configured
+organization and market profile.
+
 ---
- 
+
 ### Section 0: Executive Summary (The 30-Second Read)
- 
+
 Three bullets, each two sentences max. Written for someone who will read this section only.
- 
+
 Format:
-- **Sector state:** One sentence characterizing where the sector is in the cycle (e.g. "Stabilizing with divergence — PSA and EXR decelerating while SMA and CUBE show sequential improvement"). One sentence on the implication.
-- **Biggest surprise:** The one data point most different from 6-month-ago consensus expectations. One sentence on what it means.
-- **NC read-through:** The single most important takeaway for a Raleigh/Charlotte-region operator.
+- **Sector state:** One sentence characterizing where the sector is in the cycle. One
+  sentence on the implication.
+- **Biggest surprise:** The data point most different from recent consensus expectations.
+  One sentence on what it means.
+- **Market read-through:** The most important takeaway for the configured markets.
+
 ---
- 
-### Section 1: Sector Snapshot Table (5-Quarter Matrix)
- 
-Comparative table across all 5 quarters, one sub-table per metric. Column order always:
-**PSA | EXR | CUBE | NSA | SMA | Median | Range**
- 
+
+### Section 1: Sector Snapshot Table
+
+Comparative table across all quarters in the horizon, one sub-table per metric. Column
+order is selected peers, then Median, then Range.
+
 Repeat for each of these metrics:
-- Ending Occupancy (%)
-- SS Revenue Δ YoY (%)
-- SS Opex Δ YoY (%)
-- SS NOI Δ YoY (%)
-- Move-in Rate Δ YoY (%)
-- Core FFO/sh YoY (%)
-Example structure (for one metric):
- 
-| Quarter | PSA | EXR | CUBE | NSA | SMA | Median | Range (H−L) |
-|---|---|---|---|---|---|---|---|
-| Q4'24 | | | | | | | |
-| Q1'25 | | | | | | | |
-| Q2'25 | | | | | | | |
-| Q3'25 | | | | | | | |
-| Q4'25 | | | | | | | |
-| **Sequential Δ** | ↑/↓/→ | ↑/↓/→ | ↑/↓/→ | ↑/↓/→ | ↑/↓/→ | | |
-| **5Q trajectory** | Stabilizing | Accelerating | … | | | | |
- 
-Color coding convention (use in widget):
+- Ending occupancy (%)
+- Same-store revenue change YoY (%)
+- Same-store opex change YoY (%)
+- Same-store NOI change YoY (%)
+- Move-in rate change YoY (%)
+- Core FFO/share or equivalent YoY (%)
+
+Example structure:
+
+| Quarter | Peer 1 | Peer 2 | Peer 3 | Median | Range |
+|---|---|---|---|---|---|
+| Q4'24 | | | | | |
+| Q1'25 | | | | | |
+| **Sequential change** | Up/Down/Flat | | | | |
+| **Trajectory** | Stabilizing | Accelerating | | | |
+
+Color coding convention in widget:
 - Green: positive / improving
-- Amber: flat / slightly negative (-0.1% to -1.5%)
-- Red: materially negative (worse than -1.5%)
-- Sequential arrow color follows direction: ↑ green, ↓ red, → gray
-**So What for ASSI:** [one sentence synthesizing the sector snapshot into a read for the Triangle region]
- 
+- Amber: flat / slightly negative
+- Red: materially negative
+- Sequential direction follows improvement/deterioration, not raw numeric sign when lower
+  is better.
+
+**So What:** [one sentence synthesizing the sector snapshot into a read for the configured markets]
+
 ---
- 
+
 ### Section 2: Trend Visualizations (Widget)
- 
-Render via `show_widget` (HTML/React with Recharts). Reuse the widget across all charts; do not call `show_widget` multiple times — put multiple charts inside one widget with tab or scroll navigation.
- 
-**Chart A — 5-Quarter Same-Store NOI Trajectory**
-Line chart, one line per REIT across all 5 quarters. Y-axis: SS NOI Δ YoY (%). Include a median line (dashed, white) overlaid. Zero line is solid gray.
- 
-**Chart B — 5-Quarter Occupancy Trajectory**
-Line chart, one line per REIT across all 5 quarters. Y-axis: ending occupancy (%). Dashed horizontal reference line at 90%.
- 
-**Chart C — Revenue vs. Expense Growth (Most Recent Quarter)**
-Clustered bar: per REIT, side-by-side bars for revenue Δ and expense Δ. Annotate the gap (margin compression/expansion) above each cluster.
- 
-**Chart D — Cross-REIT Dispersion Over Time**
-Line chart showing (high − low) range across REITs for SS Revenue Δ, SS NOI Δ, and Occupancy, one line each, across all 5 quarters. Rising lines = sector diverging; falling lines = sector converging.
- 
-**Chart E — Move-In Rate vs. Revenue Growth Scatter**
-One dot per REIT for most recent quarter. X-axis: move-in rate Δ YoY. Y-axis: SS revenue Δ YoY. Shows whether revenue is being driven by rate, occupancy, or ECRI.
- 
+
+Render all charts inside one widget with tab or scroll navigation.
+
+**Chart A - Same-Store NOI Trajectory**
+Line chart, one line per peer across the horizon. Y-axis: same-store NOI change YoY (%).
+Include a median line. Zero line is solid gray.
+
+**Chart B - Occupancy Trajectory**
+Line chart, one line per peer across the horizon. Y-axis: ending occupancy (%). Add an
+appropriate reference line only if it is meaningful for the selected peer set.
+
+**Chart C - Revenue vs. Expense Growth**
+Clustered bar for the most recent quarter: per peer, side-by-side bars for revenue change
+and expense change. Annotate margin compression or expansion above each cluster.
+
+**Chart D - Cross-Peer Dispersion Over Time**
+Line chart showing range across peers for same-store revenue change, same-store NOI change,
+and occupancy.
+
+**Chart E - Move-In Rate vs. Revenue Growth Scatter**
+One dot per peer for the most recent quarter. X-axis: move-in rate change YoY. Y-axis:
+same-store revenue change YoY.
+
 **Style directives:**
-- Dark background (`#0f1117`), IBM Plex Mono for labels, IBM Plex Sans for titles
-- Palette: PSA=`#4e9af1`, EXR=`#f5a623`, CUBE=`#7ed321`, NSA=`#9b59b6`, SMA=`#e74c3c`, Median=`#ffffff`
-- Load `read_me` modules `chart` and `data_viz` before building
-**So What for ASSI:** [one sentence on what the trajectory means for ASSI's 2026 rate/occupancy posture]
- 
+- Use a readable professional dashboard style
+- Assign stable, high-contrast colors to peers dynamically
+- Include labels, source notes, and quarter labels
+
+**So What:** [one sentence on what the trajectory means for the configured rate and occupancy posture]
+
 ---
- 
-### Section 3: Cross-REIT Dispersion & Consensus
- 
-New section — the heart of the "sector vs. individual story" read.
- 
+
+### Section 3: Cross-Peer Dispersion & Consensus
+
 **3A. Direction Consensus Table**
- 
+
 For the most recent quarter, show per-metric:
- 
-| Metric | REITs positive | REITs negative | Call |
+
+| Metric | Peers positive | Peers negative | Call |
 |---|---|---|---|
-| SS Revenue Δ YoY | | | Consensus ↑ / Split / Consensus ↓ |
-| SS NOI Δ YoY | | | |
-| Ending Occupancy QoQ | | | |
-| Move-in Rate Δ YoY | | | |
- 
+| Same-store revenue change YoY | | | Consensus up / Split / Consensus down |
+| Same-store NOI change YoY | | | |
+| Ending occupancy QoQ | | | |
+| Move-in rate change YoY | | | |
+
 **3B. Dispersion Commentary**
- 
+
 Two paragraphs:
-1. Where is the sector *converging*? (Metrics where all 5 REITs are moving in the same direction with small range.) This is where sector-wide dynamics dominate.
-2. Where is the sector *diverging*? (Metrics with wide range.) This is where individual operator strategy / portfolio composition is the story. Identify the outlier(s) and state why.
+1. Where the sector is converging and what sector-wide dynamics dominate.
+2. Where the sector is diverging and which operator strategy, portfolio composition, or
+   market exposure explains the outliers.
+
 **3C. Outlier Spotlight**
- 
-One short paragraph on the REIT most differentiated this quarter (best or worst) and the two most likely drivers.
- 
-**So What for ASSI:** [one sentence on whether ASSI's NC submarkets should track the consensus or the outlier]
- 
+
+One short paragraph on the most differentiated peer this quarter and the two most likely drivers.
+
+**So What:** [one sentence on whether the configured markets should track consensus or outlier behavior]
+
 ---
- 
+
 ### Section 4: Forward Guidance & Tone
- 
+
 **4A. Guidance Table (Most Recent Quarter)**
- 
-| REIT | SS Rev Guidance | SS Opex Guidance | SS NOI Guidance | Core FFO Guidance | Tone |
-|------|-----------------|------------------|-----------------|-------------------|------|
-| PSA  | range (mid)     | range (mid)      | range (mid)     | range (mid)       | |
-| EXR  |                 |                  |                 |                   | |
-| CUBE |                 |                  |                 |                   | |
-| NSA  |                 |                  |                 |                   | |
-| SMA  |                 |                  |                 |                   | |
- 
-Tone: Cautious / Neutral / Constructive / Bullish (single word).
- 
-Show both the range AND the midpoint (e.g. "-1.0% to +0.5% (midpoint -0.25%)").
- 
+
+| Peer | SS Rev Guidance | SS Opex Guidance | SS NOI Guidance | FFO / Earnings Guidance | Tone |
+|---|---|---|---|---|---|
+
+Tone: Cautious / Neutral / Constructive / Bullish.
+
+Show both the range and the midpoint whenever available.
+
 **4B. Sector Consensus Outlook**
- 
-2-3 sentences on the implied full-year direction. Identify the most bullish and most cautious REIT and what each is betting on.
- 
+
+Two to three sentences on the implied full-year direction. Identify the most bullish and
+most cautious peer and what each is betting on.
+
 **4C. Pending Corporate Events**
- 
-Flag material events that affect guidance interpretation (pending M&A, leadership changes, major capital raises/dispositions). Example: NSA's pending acquisition by PSA makes NSA guidance less forward-useful.
- 
-**So What for ASSI:** [one sentence on what the guidance band implies for ASSI's 2026 budget assumptions]
- 
+
+Flag material events that affect guidance interpretation, such as pending M&A, leadership
+changes, major capital raises, dispositions, or strategy shifts.
+
+**So What:** [one sentence on what the guidance band implies for the configured budget or underwriting assumptions]
+
 ---
- 
-### Section 5: Guidance Accuracy Tracking (Two-Year Lookback)
- 
-Table of full-year guidance vs. actuals for the most recent *two* completed years:
- 
-| REIT | Year-1 Guide Mid | Year-1 Actual | Year-1 Score | Year-2 Guide Mid | Year-2 Actual | Year-2 Score | Pattern |
-|------|------------------|---------------|--------------|------------------|---------------|--------------|---------|
- 
-Pattern values: "Chronically optimistic," "Chronically conservative," "Accurate," "Volatile."
- 
-One paragraph below the table: which REITs' guidance to trust more when setting ASSI's budget assumptions, and which to discount.
- 
-**So What for ASSI:** [one sentence on which REIT's guidance should be weighted most heavily when anchoring ASSI's outlook]
- 
+
+### Section 5: Guidance Accuracy Tracking
+
+Table of full-year guidance vs. actuals for the most recent two completed years when available:
+
+| Peer | Year-1 Guide Mid | Year-1 Actual | Year-1 Score | Year-2 Guide Mid | Year-2 Actual | Year-2 Score | Pattern |
+|---|---|---|---|---|---|---|---|
+
+Pattern values: Optimistic / Conservative / Accurate / Volatile / Insufficient history.
+
+One paragraph below the table: whose guidance should be weighted most heavily for the
+configured use case, and whose guidance should be discounted.
+
+**So What:** [one sentence on which public guidance is most useful for the configured outlook]
+
 ---
- 
-### Section 6: NC Operator Intelligence Brief
- 
-This section is the most valuable for ASSI. Write in plain prose (not bullets) with subheadings.
- 
-**6A. NC / Southeast Market Signals**
-Any direct market mentions from the quarter. If none, note what commentary implies for Sun Belt markets and specifically the Research Triangle. Flag South-region performance from Yardi Matrix if available.
- 
+
+### Section 6: Market Operator Intelligence Brief
+
+This section translates public-operator commentary into the user's configured geography
+and operating model. Write in plain prose with subheadings.
+
+**6A. Configured Market Signals**
+Direct market mentions from the quarter. If none exist, use clearly labeled analogs from
+similar market types and explain the inference.
+
 **6B. Supply Pipeline Watch**
-New supply commentary with NC relevance. What % of REIT portfolios face competitive supply pressure entering the upcoming year? Is that improving or worsening? Extract any REIT-specific commentary on Charlotte, Raleigh, Greensboro, or Research Triangle submarkets.
- 
-Map to ASSI submarkets explicitly:
-- **Johnston County (Clayton, Angier):** How does commentary apply?
-- **Wake County suburbs (Fuquay-Varina, Knightdale):**
-- **Chatham County (Pittsboro):**
-- **Cabarrus County (Concord):**
-- **Triad / High Point:** (Previously flagged as highest-risk for oversupply — does REIT commentary confirm or refute?)
+New supply commentary with relevance to the configured markets. Extract any direct mentions
+of the configured submarkets; otherwise compare against adjacent or structurally similar
+markets with clear caveats.
+
+Map explicitly to each configured market or submarket from the Market Profile.
+
 **6C. Demand Drivers**
-Housing market and migration commentary. Any direct NC figures (housing turnover, migration) should be pulled from current Census/NAR data, not memorized. Frame: what is the leading indicator for NC demand over the next 12 months?
- 
+Housing market, migration, employment, household formation, and transaction-volume
+commentary. Pull current local facts from sources at run time and cite them; do not rely on
+stored demographic assumptions.
+
 **6D. Technology & Operational Practices Worth Adopting**
-What are the REITs investing in that a 20-facility regional operator should watch? For each initiative:
+What public operators are investing in that the configured operator should watch. For each
+initiative:
 - What it is
-- Which REIT(s) are doing it
-- NC Relevance: 🔴 Watch / 🟡 Relevant / 🟢 Act Now
-- Applicability note for ASSI (reference ASSI's existing custom tech where relevant: gate monitoring, protection plan administration, tenant auditing, deal underwriting)
-Baseline categories to check every run: AI pricing agents, dynamic pricing cadence, digital marketing attribution, centralized call centers, self-service kiosks, third-party management platforms, revenue management software, lien/auction automation, tenant insurance/protection plan penetration, delinquency management automation, OCR'd move-in workflows.
- 
+- Which peer(s) are doing it
+- Relevance: Watch / Relevant / Act Now
+- Applicability note for the configured operating model
+
+Baseline categories to check every run: AI pricing, dynamic pricing cadence, digital
+marketing attribution, centralized call centers, self-service kiosks, third-party management
+platforms, revenue management software, lien/auction automation, tenant insurance or
+protection plan penetration, delinquency management automation, and move-in workflow automation.
+
 **6E. Rate & Pricing Intelligence**
-REIT move-in rate trends (YoY). ECRI cadence and philosophy commentary. Discount/concession strategies. Frame as: what pricing environment is ASSI competing in, and what are the largest operators doing that applies pressure on or supports regional operator rate-holding?
- 
+Move-in rate trends, ECRI cadence, concession strategies, and discounting philosophy. Frame
+as what pricing environment the configured operator is competing in.
+
 **6F. Immaterial Flags**
-One paragraph listing callouts from REIT earnings NOT relevant to NC operations (CA rent control, NYC/Boston supply dynamics, etc.) so the reader can confirm they were considered and consciously excluded.
- 
-**So What for ASSI (overall):** [two-sentence synthesis closing the section]
- 
+One paragraph listing public-operator callouts that were considered but are not relevant to
+the configured markets, with a short reason for exclusion.
+
+**So What:** [two-sentence synthesis closing the section]
+
 ---
- 
+
 ## Quality Standards
- 
-- All % figures presented with one decimal place precision (e.g., -1.1%, not "about -1%")
-- Occupancy changes shown in basis points (e.g., "down 70 bps"), not decimal percent
-- If a data point is unavailable after two search attempts, show "N/A" rather than estimating — but make one more attempt via the company's most recent 10-Q / 8-K on SEC EDGAR before giving up
-- Never conflate full-year figures with single-quarter figures; always label clearly
-- Guidance ranges must show both the range AND the midpoint
+
+- All percentages presented with one decimal place precision when the source supports it
+- Occupancy changes shown in basis points
+- If a data point is unavailable after two search attempts, show "N/A" rather than estimating;
+  make one more attempt via the company's most recent filing before giving up
+- Never conflate full-year figures with single-quarter figures
+- Guidance ranges must show both the range and the midpoint when available
 - Distinguish clearly between same-store portfolio metrics and total-portfolio metrics
 - Every specific statistic cited in the brief must have an inline source and quarter label
-- Sequential arrows require the comparison to be quarter-over-quarter of the same metric; do not mix YoY and QoQ in the same arrow
-- Do **not** carry NC-specific demographic facts (migration figures, housing turnover) from memory — pull fresh from Census/NAR/Yardi at run time and cite
+- Sequential arrows require a quarter-over-quarter comparison of the same metric
+- Do not carry market-specific demographic facts from memory; pull fresh local data at run
+  time and cite it
+- Clearly label inferred market read-throughs when there is no direct mention of the
+  configured markets
+
 ---
- 
-## NC Market Context (for framing, not citation)
- 
-ASSI's primary submarkets: Research Triangle (Raleigh, Durham, RTP), Johnston County (Clayton, Angier), Chatham County (Pittsboro), Wake County suburbs (Fuquay-Varina, Knightdale), Cabarrus County (Concord), High Point / Greensboro corridor.
- 
-Structural facts (re-verify if citing):
-- NC consistently ranks top-3 nationally for net domestic migration (behind FL, often tied with TX/SC)
-- Charlotte and Raleigh MSAs are Sun Belt population-growth leaders
-- Research Triangle historically attracts new self-storage supply along major corridors (US-1, I-40, I-540)
-- NC has no statewide rent control regulation — CA-specific REIT commentary is not applicable
-- Triad/Greensboro flagged internally by ASSI as highest-risk for oversupply
+
+## Market Context (Configured at Run Time)
+
+Use the Market Profile established on first run. Market context can include:
+- Primary geography and operating regions
+- MSAs, counties, cities, corridors, and named submarkets
+- Portfolio size and operating model
+- Known competitors and peer emphasis
+- Priority strategic questions
+- Known supply, demand, rate, or occupancy concerns
+
+Re-verify any structural facts before citing them in output.
+
 ---
- 
+
 ## Refresh Cadence
- 
+
 Designed to re-run quarterly after each earnings season:
- 
+
 | Run | Timing | Captures |
 |---|---|---|
 | Q1 results | Mid-May | Prior Q2, Q3, Q4 + current Q1 + prior year Q1 |
 | Q2 results | Mid-August | Prior Q3, Q4, Q1 + current Q2 + prior year Q2 |
 | Q3 results | Mid-November | Prior Q4, Q1, Q2 + current Q3 + prior year Q3 |
 | Q4 / FY results | Late February | Prior Q1, Q2, Q3 + current Q4 + prior year Q4 |
- 
-When re-running, the prior run's output can be provided as context — use it to populate the guidance accuracy tracking (Section 5) and to flag what has changed in sector narrative since last run.
- 
+
+When re-running, use prior output or the Market Profile to populate guidance accuracy
+tracking and to flag what changed in sector narrative since the last run.
+
 ---
- 
+
 ## Markdown Brief File
- 
-Save the full brief to `/mnt/user-data/outputs/reit-intel-brief-Q[N]-[YEAR].md` and present via `present_files`. File structure mirrors Sections 0-6 above. First line: scope parameter block. Last line: "Prepared [date] · Sources: [primary sources used]."
+
+Save the full brief to the available output directory using a neutral filename such as
+`reit-intel-brief-Q[N]-[YEAR].md`. File structure mirrors Sections 0-6 above. First line:
+scope parameter block. Last line: `Prepared [date]. Sources: [primary sources used].`
