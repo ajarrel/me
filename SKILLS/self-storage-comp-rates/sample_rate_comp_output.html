@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Comp Rate Tracker — Harrisburg (NC-49 S) — 2026-05-21</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --paper: #f5f1e8;
+    --paper-warm: #efe8d8;
+    --rule: #c8bda5;
+    --rule-soft: #ddd2bc;
+    --muted: #6b6354;
+    --accent: #8b2f2f;
+    --accent-soft: #f0d8d8;
+    --green: #3d5c3d;
+    --green-soft: #d8e3d3;
+    --gold: #876820;
+    --gold-soft: #ede1bc;
+    --blue: #2d4a6b;
+    --blue-soft: #d4dde8;
+    --subject-bg: #fef9ee;
+    --subject-border: #c9a64a;
+    --grain: rgba(0,0,0,0.02);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter Tight', -apple-system, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.5;
+    padding: 0;
+    background-image:
+      radial-gradient(circle at 1px 1px, var(--grain) 1px, transparent 0);
+    background-size: 4px 4px;
+  }
+
+  .page {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 56px 64px 80px;
+    background: var(--paper);
+    position: relative;
+  }
+
+  .page::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 12px;
+    background: var(--ink);
+  }
+
+  /* ───── HEADER ───── */
+  .masthead {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 24px;
+    margin-bottom: 32px;
+  }
+
+  .masthead-left {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 52px;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    font-variation-settings: "opsz" 96;
+  }
+
+  h1 em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+
+  .masthead-meta {
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+
+  .masthead-meta strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  /* ───── RUN HEADER STRIP ───── */
+  .run-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border: 1px solid var(--rule);
+    background: var(--paper-warm);
+    margin-bottom: 48px;
+  }
+
+  .run-cell {
+    padding: 16px 20px;
+    border-right: 1px solid var(--rule);
+  }
+
+  .run-cell:last-child { border-right: none; }
+
+  .run-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .run-value {
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.25;
+  }
+
+  /* ───── SECTIONS ───── */
+  section {
+    margin-bottom: 56px;
+  }
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .section-marker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 28px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    font-variation-settings: "opsz" 48;
+  }
+
+  .section-subtitle {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+    margin-left: auto;
+    font-style: italic;
+  }
+
+  /* ───── COMP SET TABLE ───── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .comp-table th, .comp-table td {
+    padding: 11px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+
+  .comp-table th {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .comp-table td {
+    font-family: 'Inter Tight', sans-serif;
+  }
+
+  .comp-table tr:hover td { background: var(--paper-warm); }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    border-radius: 2px;
+    font-weight: 500;
+  }
+
+  .badge-reit { background: var(--blue-soft); color: var(--blue); }
+  .badge-ind { background: var(--gold-soft); color: var(--gold); }
+  .badge-sister { background: var(--accent-soft); color: var(--accent); }
+
+  .id-mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* ───── RATE MATRIX ───── */
+  .matrix-wrap {
+    margin-bottom: 24px;
+  }
+
+  .matrix-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border-left: 3px solid var(--accent);
+    padding-left: 12px;
+    margin-bottom: 14px;
+    font-weight: 500;
+  }
+
+  .matrix {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    border: 1px solid var(--rule);
+  }
+
+  .matrix th {
+    background: var(--paper-warm);
+    color: var(--ink);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+    padding: 10px 8px;
+    text-align: center;
+    border-bottom: 2px solid var(--ink);
+    border-right: 1px solid var(--rule-soft);
+    line-height: 1.3;
+  }
+
+  .matrix th:first-child {
+    text-align: left;
+    padding-left: 14px;
+    background: var(--ink);
+    color: var(--paper);
+    width: 110px;
+  }
+
+  .matrix th.subject-col {
+    background: var(--subject-bg);
+    border-bottom-color: var(--subject-border);
+  }
+
+  .matrix th .meta {
+    display: block;
+    font-size: 9px;
+    color: var(--muted);
+    font-weight: 400;
+    margin-top: 3px;
+    letter-spacing: 0.04em;
+  }
+
+  .matrix th.subject-col .meta { color: var(--gold); }
+
+  .matrix th .star {
+    color: var(--accent);
+    margin-right: 3px;
+  }
+
+  .matrix td {
+    padding: 11px 8px;
+    text-align: center;
+    border-right: 1px solid var(--rule-soft);
+    border-bottom: 1px solid var(--rule-soft);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ink);
+  }
+
+  .matrix td:first-child {
+    text-align: left;
+    padding-left: 14px;
+    font-family: 'Fraunces', serif;
+    font-size: 14px;
+    font-weight: 500;
+    background: var(--paper-warm);
+    color: var(--ink);
+  }
+
+  .matrix td.subject-cell {
+    background: var(--subject-bg);
+    font-weight: 600;
+    color: var(--ink);
+    border-right: 1px solid var(--subject-border);
+  }
+
+  .matrix td.subject-cell .promo {
+    display: block;
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 400;
+    margin-top: 2px;
+  }
+
+  .matrix td.median-cell {
+    background: var(--paper-warm);
+    font-weight: 600;
+    color: var(--accent);
+    border-left: 2px solid var(--ink);
+  }
+
+  .matrix td.empty { color: var(--rule); }
+
+  .matrix-notes {
+    margin-top: 14px;
+    padding: 14px 18px;
+    background: var(--paper-warm);
+    border-left: 3px solid var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--ink);
+    font-style: italic;
+  }
+
+  .matrix-notes strong {
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  /* ───── CHANGE LOG (FIRST RUN) ───── */
+  .first-run-banner {
+    padding: 32px 40px;
+    background: var(--gold-soft);
+    border-left: 4px solid var(--gold);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+
+  .first-run-banner strong {
+    font-style: normal;
+    font-weight: 600;
+    color: var(--gold);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  /* ───── MARKET SUMMARY ───── */
+  .market-summary {
+    column-count: 2;
+    column-gap: 48px;
+    column-rule: 1px solid var(--rule-soft);
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--ink);
+    font-variation-settings: "opsz" 18;
+  }
+
+  .market-summary p:first-child::first-letter {
+    font-size: 56px;
+    float: left;
+    font-weight: 600;
+    line-height: 0.9;
+    margin: 6px 8px 0 0;
+    color: var(--accent);
+    font-family: 'Fraunces', serif;
+  }
+
+  .market-summary strong {
+    font-weight: 600;
+    color: var(--ink);
+    background: linear-gradient(transparent 65%, var(--gold-soft) 65%);
+  }
+
+  /* ───── ACTION ITEMS ───── */
+  .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .action {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    gap: 24px;
+    padding: 20px 24px;
+    background: var(--paper-warm);
+    border-left: 4px solid var(--rule);
+  }
+
+  .action-high { border-left-color: var(--accent); }
+  .action-med { border-left-color: var(--gold); }
+  .action-hold { border-left-color: var(--green); }
+  .action-info { border-left-color: var(--blue); }
+
+  .action-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    font-weight: 600;
+    text-transform: uppercase;
+    align-self: start;
+    padding-top: 2px;
+  }
+
+  .action-high .action-tag { color: var(--accent); }
+  .action-med .action-tag { color: var(--gold); }
+  .action-hold .action-tag { color: var(--green); }
+  .action-info .action-tag { color: var(--blue); }
+
+  .action-body {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+
+  .action-title {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--ink);
+  }
+
+  .action-detail {
+    color: var(--muted);
+    font-size: 13px;
+    margin: 4px 0;
+  }
+
+  .action-recommend {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: var(--paper);
+    border-left: 2px solid var(--ink);
+    font-size: 13px;
+  }
+
+  .action-recommend strong {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* ───── JSON BLOCK ───── */
+  .json-intro {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    padding: 12px 18px;
+    background: var(--gold-soft);
+    border-left: 3px solid var(--gold);
+  }
+
+  .json-intro strong {
+    font-style: normal;
+    color: var(--ink);
+  }
+
+  pre.json {
+    background: #1a1a1a;
+    color: #e8d4a8;
+    padding: 24px 28px;
+    border-radius: 0;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    max-height: 480px;
+    overflow-y: auto;
+    border: 1px solid var(--ink);
+  }
+
+  pre.json::-webkit-scrollbar { width: 8px; height: 8px; }
+  pre.json::-webkit-scrollbar-track { background: #2a2a2a; }
+  pre.json::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
+
+  /* ───── HOUSEKEEPING ───── */
+  .housekeeping {
+    background: var(--paper-warm);
+    padding: 24px 32px;
+    border: 1px solid var(--rule);
+  }
+
+  .housekeeping ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .housekeeping li {
+    padding: 8px 0 8px 32px;
+    border-bottom: 1px dashed var(--rule-soft);
+    position: relative;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .housekeeping li:last-child { border-bottom: none; }
+
+  .housekeeping li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    top: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .housekeeping strong {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* ───── FOOTER ───── */
+  .footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 2px solid var(--ink);
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ───── RESPONSIVE ───── */
+  @media (max-width: 900px) {
+    .page { padding: 32px 24px; }
+    h1 { font-size: 36px; }
+    .masthead { grid-template-columns: 1fr; gap: 12px; }
+    .masthead-meta { text-align: left; }
+    .run-strip { grid-template-columns: 1fr 1fr; }
+    .market-summary { column-count: 1; }
+    .matrix { font-size: 11px; }
+    .matrix th, .matrix td { padding: 6px 4px; }
+    .action { grid-template-columns: 1fr; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- MASTHEAD -->
+  <header class="masthead">
+    <div class="masthead-left">
+      <div class="eyebrow">Competitive Rate Intelligence · ASSI LLC</div>
+      <h1>Harrisburg <em>NC-49</em> South</h1>
+    </div>
+    <div class="masthead-meta">
+      <div>Run No. <strong>001</strong> · First Baseline</div>
+      <div>2026 · 05 · 21</div>
+      <div>Prepared for A. Norris</div>
+    </div>
+  </header>
+
+  <!-- RUN STRIP -->
+  <div class="run-strip">
+    <div class="run-cell">
+      <div class="run-label">Subject</div>
+      <div class="run-value">American Self Storage<br>2942 NC-49 S</div>
+    </div>
+    <div class="run-cell">
+      <div class="run-label">Comp Set</div>
+      <div class="run-value">6 facilities<br>~5 mi radius</div>
+    </div>
+    <div class="run-cell">
+      <div class="run-label">Composition</div>
+      <div class="run-value">4 REIT<br>2 Independent</div>
+    </div>
+    <div class="run-cell">
+      <div class="run-label">Prior Run</div>
+      <div class="run-value">None<br>First baseline</div>
+    </div>
+  </div>
+
+  <!-- SECTION A: COMP SET -->
+  <section>
+    <div class="section-head">
+      <span class="section-marker">§ A</span>
+      <h2>Competitive Set</h2>
+      <span class="section-subtitle">Sister property tracked separately</span>
+    </div>
+
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Facility</th>
+          <th>Distance</th>
+          <th>Type</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="id-mono">psa-stough</span></td>
+          <td>Public Storage — 4971 Stough Rd, Concord</td>
+          <td>1.19 mi</td>
+          <td><span class="badge badge-reit">REIT</span></td>
+          <td>Closest comp; multi-level + drive-up; 4.6★</td>
+        </tr>
+        <tr>
+          <td><span class="id-mono">mr-storage-5435</span></td>
+          <td>Mr. Storage — 5435 NC-49, Harrisburg</td>
+          <td>~1.0 mi</td>
+          <td><span class="badge badge-ind">IND</span></td>
+          <td>Direct NC-49 corridor; U-Haul affiliate</td>
+        </tr>
+        <tr>
+          <td><span class="id-mono">exr-veterans</span></td>
+          <td>Extra Space — 169 Harrisburg Veterans Rd</td>
+          <td>1.64 mi</td>
+          <td><span class="badge badge-reit">REIT</span></td>
+          <td>Premium anchor; large RV/parking program</td>
+        </tr>
+        <tr>
+          <td><span class="id-mono">exr-univ-city</span></td>
+          <td>Extra Space — 12120 University City Blvd</td>
+          <td>3.45 mi</td>
+          <td><span class="badge badge-reit">REIT</span></td>
+          <td>Mid-tier; deep discounting on non-CC</td>
+        </tr>
+        <tr>
+          <td><span class="id-mono">psa-weddington</span></td>
+          <td>Public Storage — 6815 Weddington Rd, Concord</td>
+          <td>~3.5 mi</td>
+          <td><span class="badge badge-reit">REIT</span></td>
+          <td>Smaller location; CC-heavy</td>
+        </tr>
+        <tr>
+          <td><span class="id-mono">safenest-univ</span></td>
+          <td>SafeNest Storage — 12120 University City Blvd</td>
+          <td>~3.0 mi</td>
+          <td><span class="badge badge-ind">IND</span></td>
+          <td>Co-located w/ EXR UC; premium indie pricing</td>
+        </tr>
+        <tr style="opacity:0.7;">
+          <td><span class="id-mono">assi-speedway</span></td>
+          <td>American Self Storage — Speedway (5498 Hudspeth Dairy)</td>
+          <td>~3.0 mi</td>
+          <td><span class="badge badge-sister">SISTER</span></td>
+          <td>Excluded from comp set; ASSI-owned</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- SECTION B: RATE MATRIX -->
+  <section>
+    <div class="section-head">
+      <span class="section-marker">§ B</span>
+      <h2>Rate Matrix</h2>
+      <span class="section-subtitle">Street rates · USD/month · pulled 2026-05-21</span>
+    </div>
+
+    <!-- CC MATRIX -->
+    <div class="matrix-wrap">
+      <div class="matrix-title">Climate-Controlled</div>
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th>Unit</th>
+            <th class="subject-col"><span class="star">★</span>Subject<span class="meta">NC-49 S</span></th>
+            <th>PSA Stough<span class="meta">1.2 mi · REIT</span></th>
+            <th>Mr Storage<span class="meta">~1 mi · Ind</span></th>
+            <th>EXR Veterans<span class="meta">1.6 mi · REIT</span></th>
+            <th>EXR Univ City<span class="meta">3.4 mi · REIT</span></th>
+            <th>PSA Weddington<span class="meta">3.5 mi · REIT</span></th>
+            <th>SafeNest UC<span class="meta">3 mi · Ind</span></th>
+            <th>Median</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>CC 5×5</td>
+            <td class="subject-cell">$18<span class="promo">$8 promo</span></td>
+            <td>$23</td>
+            <td>$55</td>
+            <td>$61</td>
+            <td>$51</td>
+            <td class="empty">—</td>
+            <td>$70</td>
+            <td class="median-cell">$53</td>
+          </tr>
+          <tr>
+            <td>CC 5×10</td>
+            <td class="subject-cell">$60<span class="promo">$51 promo</span></td>
+            <td>$40</td>
+            <td>$80</td>
+            <td>$108</td>
+            <td>$90</td>
+            <td>$58</td>
+            <td>$103</td>
+            <td class="median-cell">$85</td>
+          </tr>
+          <tr>
+            <td>CC 10×10</td>
+            <td class="subject-cell">$162<span class="promo">$95 promo</span></td>
+            <td>$128</td>
+            <td>$100</td>
+            <td>$188</td>
+            <td>$158</td>
+            <td>$109</td>
+            <td>$156</td>
+            <td class="median-cell">$142</td>
+          </tr>
+          <tr>
+            <td>CC 10×15</td>
+            <td class="subject-cell">$174<span class="promo">$149 promo</span></td>
+            <td>$114</td>
+            <td>$140</td>
+            <td>$265</td>
+            <td>$237</td>
+            <td>$129</td>
+            <td class="empty">—</td>
+            <td class="median-cell">$140</td>
+          </tr>
+          <tr>
+            <td>CC 10×20</td>
+            <td class="subject-cell">$241<span class="promo">$223 promo</span></td>
+            <td>$185</td>
+            <td class="empty">—</td>
+            <td>$352</td>
+            <td>$293</td>
+            <td>$245</td>
+            <td class="empty">—</td>
+            <td class="median-cell">$269</td>
+          </tr>
+          <tr>
+            <td>CC 10×30</td>
+            <td class="subject-cell empty">—</td>
+            <td>$321</td>
+            <td class="empty">—</td>
+            <td>$527</td>
+            <td>$374</td>
+            <td class="empty">—</td>
+            <td class="empty">—</td>
+            <td class="median-cell">$374</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="matrix-notes">
+        Subject also offers unique CC products — 3×4 locker ($12), 7.5×9 ($88), 5×15 ($94), 7.5×14.5 ($107), 20×15 ($343). <strong>PSA Stough running heavy promos</strong> on small CC ($16–$23 5×5). <strong>EXR Veterans is the premium anchor</strong>; everyone else is well below it.
+      </div>
+    </div>
+
+    <!-- CONV MATRIX -->
+    <div class="matrix-wrap">
+      <div class="matrix-title">Conventional · Drive-Up / Non-CC</div>
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th>Unit</th>
+            <th class="subject-col"><span class="star">★</span>Subject<span class="meta">NC-49 S</span></th>
+            <th>PSA Stough<span class="meta">1.2 mi · REIT</span></th>
+            <th>Mr Storage<span class="meta">~1 mi · Ind</span></th>
+            <th>EXR Veterans<span class="meta">1.6 mi · REIT</span></th>
+            <th>EXR Univ City<span class="meta">3.4 mi · REIT</span></th>
+            <th>PSA Weddington<span class="meta">3.5 mi · REIT</span></th>
+            <th>SafeNest UC<span class="meta">3 mi · Ind</span></th>
+            <th>Median</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Conv 5×5</td>
+            <td class="subject-cell">$43<span class="promo">$9 promo</span></td>
+            <td class="empty">—</td>
+            <td>$40</td>
+            <td>$59</td>
+            <td>$36</td>
+            <td class="empty">—</td>
+            <td>$65</td>
+            <td class="median-cell">$50</td>
+          </tr>
+          <tr>
+            <td>Conv 5×10</td>
+            <td class="subject-cell">$46<span class="promo">$39 promo</span></td>
+            <td>$33</td>
+            <td>$60</td>
+            <td>$104</td>
+            <td>$62</td>
+            <td>$51</td>
+            <td>$93</td>
+            <td class="median-cell">$61</td>
+          </tr>
+          <tr>
+            <td>Conv 10×10</td>
+            <td class="subject-cell">$91<span class="promo">$78 promo</span></td>
+            <td>$96</td>
+            <td>$80</td>
+            <td>$180</td>
+            <td>$113</td>
+            <td>$92</td>
+            <td>$130</td>
+            <td class="median-cell">$105</td>
+          </tr>
+          <tr>
+            <td>Conv 10×15</td>
+            <td class="subject-cell">$151<span class="promo">$129 promo</span></td>
+            <td>$106</td>
+            <td>$125</td>
+            <td>$253</td>
+            <td>$155</td>
+            <td class="empty">—</td>
+            <td>$177</td>
+            <td class="median-cell">$155</td>
+          </tr>
+          <tr>
+            <td>Conv 10×20</td>
+            <td class="subject-cell">$194</td>
+            <td class="empty">—</td>
+            <td class="empty">—</td>
+            <td>$309</td>
+            <td>$209</td>
+            <td>$218</td>
+            <td class="empty">—</td>
+            <td class="median-cell">$218</td>
+          </tr>
+          <tr>
+            <td>Conv 10×30+</td>
+            <td class="subject-cell">$412<span class="promo">12×30 warehouse</span></td>
+            <td class="empty">—</td>
+            <td class="empty">—</td>
+            <td class="empty">—</td>
+            <td class="empty">—</td>
+            <td class="empty">—</td>
+            <td class="empty">—</td>
+            <td class="median-cell">n/a</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="matrix-notes">
+        Subject is meaningfully below comp median on <strong>every Conv size below 10×20</strong>. The 10×20 Conv line ($194 vs $218 median) is the closest you get to market. Subject also has <strong>differentiated large-format drive-up warehouse product</strong> (12×30 / 12×35 / 12×40, $412–$642) — no direct comps, justified by limited supply of that product type in the market.
+      </div>
+    </div>
+
+    <!-- PARKING MATRIX -->
+    <div class="matrix-wrap">
+      <div class="matrix-title">Parking / Vehicle</div>
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th>Unit</th>
+            <th class="subject-col"><span class="star">★</span>Subject<span class="meta">NC-49 S</span></th>
+            <th>EXR Veterans<span class="meta">1.6 mi</span></th>
+            <th>EXR Univ City<span class="meta">3.4 mi</span></th>
+            <th>Mr Storage<span class="meta">~1 mi</span></th>
+            <th colspan="4">Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>10×20 uncov.</td>
+            <td class="subject-cell">$143</td>
+            <td>$255–$309</td>
+            <td>$102–$209</td>
+            <td class="empty">—</td>
+            <td colspan="4" style="text-align:left; font-family:'Inter Tight';">Subject mid-market</td>
+          </tr>
+          <tr>
+            <td>10×25 RV</td>
+            <td class="subject-cell empty">—</td>
+            <td>$366</td>
+            <td>$106</td>
+            <td class="empty">—</td>
+            <td colspan="4" style="text-align:left; font-family:'Inter Tight';">Wide dispersion</td>
+          </tr>
+          <tr>
+            <td>10×30 RV</td>
+            <td class="subject-cell empty">—</td>
+            <td>$435</td>
+            <td>$122–$294</td>
+            <td class="empty">—</td>
+            <td colspan="4" style="text-align:left; font-family:'Inter Tight';">EXR Vet = high anchor</td>
+          </tr>
+          <tr>
+            <td>12×35</td>
+            <td class="subject-cell empty">—</td>
+            <td class="empty">—</td>
+            <td class="empty">—</td>
+            <td>$75</td>
+            <td colspan="4" style="text-align:left; font-family:'Inter Tight';">Mr Storage low-anchor</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="matrix-notes">
+        EXR Veterans had a <strong>fire event in 2024 that destroyed covered parking</strong> — they've rebuilt and are pricing aggressively high ($229 cited in a review on the new rate). EXR Univ City is much softer on RV. Subject's $143 on 10×20 parking is below the EXR Veterans floor and above the EXR UC floor — defensible mid-market position.
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION C: CHANGE LOG -->
+  <section>
+    <div class="section-head">
+      <span class="section-marker">§ C</span>
+      <h2>Change Log (WoW)</h2>
+    </div>
+
+    <div class="first-run-banner">
+      <strong>First Run · Baseline Established</strong>
+      Week-over-week comparison will begin next run. Save the JSON in §F to enable change detection on the next pull.
+    </div>
+  </section>
+
+  <!-- SECTION D: MARKET SUMMARY -->
+  <section>
+    <div class="section-head">
+      <span class="section-marker">§ D</span>
+      <h2>Market Position</h2>
+    </div>
+
+    <div class="market-summary">
+      <p>The Harrisburg / NE Concord submarket has tightened into a <strong>wide dispersion pattern</strong>: EXR Veterans sits well above the rest of the comp set across every CC and Conv line (often 40–80% above median), while PSA Stough, EXR Univ City and Mr. Storage compete aggressively on the low end. SafeNest plays the premium-indie middle. Public Storage Stough is running very loud promotional pricing on small CC ($16–$23 for a 5×5 CC) — likely soft occupancy or an algorithmic push given the multi-level format.</p>
+
+      <p style="margin-top:1em;">Subject (NC-49 S) is <strong>broadly under-priced on smaller units and 10×15+, but appropriately positioned on 10×20 CC and parking</strong>. The 5×5 CC line in particular ($18 street) is an outlier — it appears the subject has anchored to the $8 promo floor for a sustained period, and the gap to a normalized $50–55 market level is the single largest revenue lever in the matrix. Cabarrus County remains the highest-risk market in ASSI's portfolio given Charlotte-area supply growth, but the dispersion in this comp set suggests there is <strong>room to move on the smaller units</strong> without becoming the market high.</p>
+    </div>
+  </section>
+
+  <!-- SECTION E: ACTION ITEMS -->
+  <section>
+    <div class="section-head">
+      <span class="section-marker">§ E</span>
+      <h2>Action Items</h2>
+      <span class="section-subtitle">Prioritized · top revenue levers first</span>
+    </div>
+
+    <div class="actions">
+
+      <div class="action action-high">
+        <div class="action-tag">🔴 High</div>
+        <div class="action-body">
+          <div class="action-title">CC 5×5 — 66% below market median</div>
+          <div class="action-detail">Subject <strong>$18</strong> · Comp median <strong>$53</strong> · Range $23 (PSA promo) → $70 (SafeNest)</div>
+          <div class="action-detail">Comps: PSA Stough $23 · Mr Storage $55 · EXR UC $51 · EXR Vet $61 · SafeNest $70</div>
+          <div class="action-recommend">
+            <strong>Recommend</strong>
+            Raise CC 5×5 street to <strong>$48</strong> (median −5%), phased over 2 cycles. Annualized lift on a 50-unit count of 5×5 CC: <strong>~$18K/yr</strong>. Single largest revenue lever in this matrix.
+          </div>
+        </div>
+      </div>
+
+      <div class="action action-high">
+        <div class="action-tag">🔴 High</div>
+        <div class="action-body">
+          <div class="action-title">CC 5×10 — 29% below market median</div>
+          <div class="action-detail">Subject <strong>$60</strong> · Comp median <strong>$85</strong> · Comps cluster $58–$108</div>
+          <div class="action-detail">PSA Wed $58 · Mr Storage $80 · EXR UC $90 · SafeNest $103 · EXR Vet $108</div>
+          <div class="action-recommend">
+            <strong>Recommend</strong>
+            Raise CC 5×10 to <strong>$80</strong> (target = median −5%). Keeps you below EXR Vet, SafeNest and EXR UC; above the two PSAs and Mr Storage. Defensible.
+          </div>
+        </div>
+      </div>
+
+      <div class="action action-high">
+        <div class="action-tag">🔴 High</div>
+        <div class="action-body">
+          <div class="action-title">Conv 5×10 — 25% below market median</div>
+          <div class="action-detail">Subject <strong>$46</strong> · Comp median <strong>$61</strong></div>
+          <div class="action-detail">PSA Stough $33 · PSA Wed $51 · Mr Storage $60 · EXR UC $62 · SafeNest $93</div>
+          <div class="action-recommend">
+            <strong>Recommend</strong>
+            Raise Conv 5×10 street to <strong>$58</strong> (matches PSA Wed / just under EXR UC). Mr Storage at $60 on the same NC-49 corridor is the key anchor.
+          </div>
+        </div>
+      </div>
+
+      <div class="action action-med">
+        <div class="action-tag">🟡 Med</div>
+        <div class="action-body">
+          <div class="action-title">Conv 10×10 — 13% below median</div>
+          <div class="action-detail">Subject <strong>$91</strong> · Comp median <strong>$105</strong></div>
+          <div class="action-recommend">
+            <strong>Recommend</strong>
+            Raise to <strong>$100</strong> — matches Mr Storage (same corridor) and edges past PSA Stough/Wed. Watch SafeNest at $130 — outlier on the high side.
+          </div>
+        </div>
+      </div>
+
+      <div class="action action-med">
+        <div class="action-tag">🟡 Med</div>
+        <div class="action-body">
+          <div class="action-title">CC 10×20 — 10% below median</div>
+          <div class="action-detail">Subject <strong>$241</strong> · Comp median <strong>$269</strong></div>
+          <div class="action-detail">PSA Stough $185 · PSA Wed $245 · EXR UC $293 · EXR Vet $352</div>
+          <div class="action-recommend">
+            <strong>Recommend</strong>
+            Hold for now; reasonably priced for a non-REIT product. Re-evaluate in 4 weeks if EXR Vet or EXR UC moves; tight gap to PSA Wed ($245).
+          </div>
+        </div>
+      </div>
+
+      <div class="action action-hold">
+        <div class="action-tag">🟢 Hold</div>
+        <div class="action-body">
+          <div class="action-title">Well-Positioned Sizes — No Action Needed</div>
+          <div class="action-detail">CC 10×10 ($162) · CC 10×15 ($174) · Conv 10×20 ($194) · Parking 10×20 ($143)</div>
+          <div class="action-detail">All priced within ±10% of comp median or appropriately positioned given product type.</div>
+        </div>
+      </div>
+
+      <div class="action action-info">
+        <div class="action-tag">ℹ Info</div>
+        <div class="action-body">
+          <div class="action-title">PSA Stough Heavy Small-CC Promos</div>
+          <div class="action-detail">$16–$23 for 5×5 CC — strong signal of soft occupancy on multi-level small units. Defensive, not directional. Don't chase.</div>
+        </div>
+      </div>
+
+      <div class="action action-info">
+        <div class="action-tag">ℹ Info</div>
+        <div class="action-body">
+          <div class="action-title">EXR Veterans Is The Premium Anchor</div>
+          <div class="action-detail">15–80% above comp median across every size. Not the median. Weight independents (Mr Storage, SafeNest) heavier when setting targets to avoid chasing REIT algo pricing.</div>
+        </div>
+      </div>
+
+      <div class="action action-info">
+        <div class="action-tag">ℹ Info</div>
+        <div class="action-body">
+          <div class="action-title">No New Entrants Observed</div>
+          <div class="action-detail">20 facilities total visible in Harrisburg market on StorageCafe. Saturation level worth monitoring quarterly.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION F: SAVED JSON -->
+  <section>
+    <div class="section-head">
+      <span class="section-marker">§ F</span>
+      <h2>Saved Run · JSON Baseline</h2>
+    </div>
+
+    <div class="json-intro">
+      <strong>💾 Save this for next week.</strong> Copy the block below and paste at the start of your next comp check request to enable week-over-week comparison.
+    </div>
+
+<pre class="json">{
+  "schema_version": "1.0",
+  "run_date": "2026-05-21",
+  "subject": {
+    "name": "American Self Storage – Harrisburg",
+    "address": "2942 NC-49 S, Harrisburg, NC 28075",
+    "rates": {
+      "CC": {
+        "5x5": 18,
+        "5x10": 60,
+        "10x10": 162,
+        "10x15": 174,
+        "10x20": 241,
+        "10x30": null
+      },
+      "CONV": {
+        "5x5": 43,
+        "5x10": 46,
+        "10x10": 91,
+        "10x15": 151,
+        "10x20": 194,
+        "10x30": 412
+      },
+      "PARK": {
+        "uncovered": 143,
+        "covered": null,
+        "rv_boat": null
+      }
+    },
+    "promos": [
+      {"description": "Web rate $8 1st mo on CC 5x5", "applies_to": "CC 5x5"},
+      {"description": "Web rate $9 1st mo on Conv 5x5", "applies_to": "CONV 5x5"},
+      {"description": "Web rate $51/$39 1st mo on 5x10", "applies_to": "5x10 CC/Conv"}
+    ]
+  },
+  "competitors": [
+    {
+      "id": "psa-stough",
+      "name": "Public Storage – 4971 Stough Rd",
+      "address": "4971 Stough Rd, Concord, NC 28027",
+      "distance_miles": 1.19,
+      "operator_type": "REIT",
+      "source_url": "https://www.storagecafe.com/storage/nc/concord/public-storage-4971-stough-road/",
+      "rates": {
+        "CC": {"5x5": 23, "5x10": 40, "10x10": 128, "10x15": 114, "10x20": 185, "10x30": 321},
+        "CONV": {"5x5": null, "5x10": 33, "10x10": 96, "10x15": 106, "10x20": null, "10x30": null},
+        "PARK": {"uncovered": null, "covered": null, "rv_boat": null}
+      },
+      "promos": [{"description": "$16-23 promo rate on 5x5 CC", "applies_to": "CC 5x5"}],
+      "occupancy_signals": "Heavy promo pricing on small CC suggests soft occupancy on multi-level inventory"
+    },
+    {
+      "id": "mr-storage-5435",
+      "name": "Mr. Storage – 5435 NC-49",
+      "address": "5435 NC-49, Harrisburg, NC 28075",
+      "distance_miles": 1.0,
+      "operator_type": "Ind",
+      "source_url": "https://www.storagecafe.com/storage/nc/harrisburg/mr.-storage-5435-nc-49/",
+      "rates": {
+        "CC": {"5x5": 55, "5x10": 80, "10x10": 100, "10x15": 140, "10x20": null, "10x30": null},
+        "CONV": {"5x5": 40, "5x10": 60, "10x10": 80, "10x15": 125, "10x20": null, "10x30": null},
+        "PARK": {"uncovered": null, "covered": 75, "rv_boat": null}
+      },
+      "promos": [],
+      "occupancy_signals": "Same NC-49 corridor — most direct geographic competitor"
+    },
+    {
+      "id": "exr-veterans",
+      "name": "Extra Space Storage – 169 Harrisburg Veterans Rd",
+      "address": "169 Harrisburg Veterans Rd, Harrisburg, NC 28075",
+      "distance_miles": 1.64,
+      "operator_type": "REIT",
+      "source_url": "https://www.storagecafe.com/storage/nc/harrisburg/extra-space-storage-169-harrisburg-veterans-road/",
+      "rates": {
+        "CC": {"5x5": 61, "5x10": 108, "10x10": 188, "10x15": 265, "10x20": 352, "10x30": 527},
+        "CONV": {"5x5": 59, "5x10": 104, "10x10": 180, "10x15": 253, "10x20": 309, "10x30": null},
+        "PARK": {"uncovered": 255, "covered": 567, "rv_boat": 366}
+      },
+      "promos": [],
+      "occupancy_signals": "Premium anchor pricing; rebuilt covered parking after 2024 fire — pricing aggressively"
+    },
+    {
+      "id": "exr-univ-city",
+      "name": "Extra Space Storage – 12120 University City Blvd",
+      "address": "12120 University City Blvd, Harrisburg, NC 28075",
+      "distance_miles": 3.45,
+      "operator_type": "REIT",
+      "source_url": "https://www.storagecafe.com/storage/nc/harrisburg/extra-space-storage-12120-university-city-blvd/",
+      "rates": {
+        "CC": {"5x5": 51, "5x10": 90, "10x10": 158, "10x15": 237, "10x20": 293, "10x30": 374},
+        "CONV": {"5x5": 36, "5x10": 62, "10x10": 113, "10x15": 155, "10x20": 209, "10x30": null},
+        "PARK": {"uncovered": 102, "covered": null, "rv_boat": 294}
+      },
+      "promos": [{"description": "Deep first-month discounts widely reviewed", "applies_to": "all sizes"}],
+      "occupancy_signals": "Reviews flag steep post-move-in price increases (bait pricing pattern)"
+    },
+    {
+      "id": "psa-weddington",
+      "name": "Public Storage – 6815 Weddington Rd",
+      "address": "6815 Weddington Rd, Concord, NC 28027",
+      "distance_miles": 3.5,
+      "operator_type": "REIT",
+      "source_url": "https://www.storagecafe.com/storage/nc/concord/public-storage-6815-weddington-road/",
+      "rates": {
+        "CC": {"5x5": null, "5x10": 58, "10x10": 109, "10x15": 129, "10x20": 245, "10x30": null},
+        "CONV": {"5x5": null, "5x10": 51, "10x10": 92, "10x15": null, "10x20": 218, "10x30": null},
+        "PARK": {"uncovered": null, "covered": null, "rv_boat": null}
+      },
+      "promos": [],
+      "occupancy_signals": "Reviews flag frequent post-move-in rate increases"
+    },
+    {
+      "id": "safenest-univ",
+      "name": "SafeNest Storage – 12120 University City Blvd",
+      "address": "12120 University City Blvd, Harrisburg, NC 28075",
+      "distance_miles": 3.0,
+      "operator_type": "Ind",
+      "source_url": "https://www.storagecafe.com/storage/nc/harrisburg/safenest-storage-12120-university-city-blvd/",
+      "rates": {
+        "CC": {"5x5": 70, "5x10": 103, "10x10": 156, "10x15": null, "10x20": null, "10x30": null},
+        "CONV": {"5x5": 65, "5x10": 93, "10x10": 130, "10x15": 177, "10x20": null, "10x30": null},
+        "PARK": {"uncovered": null, "covered": null, "rv_boat": null}
+      },
+      "promos": [],
+      "occupancy_signals": "Reviewer mentions water damage / building issues — quality flag"
+    }
+  ],
+  "notes": "First run for Harrisburg (NC-49 S). 5-mi radius. Excluded ASSI sister property American Self Storage – Speedway (Hudspeth Dairy Rd) from comp set. Subject has unique large-format drive-up warehouse product (12x30/35/40) with no direct comps."
+}</pre>
+  </section>
+
+  <!-- HOUSEKEEPING -->
+  <section>
+    <div class="section-head">
+      <span class="section-marker">§ G</span>
+      <h2>Housekeeping &amp; Next Steps</h2>
+    </div>
+
+    <div class="housekeeping">
+      <ul>
+        <li><strong>Save the JSON above</strong> as your new baseline for next week's run.</li>
+        <li><strong>Next run:</strong> Paste the JSON at the start of your next comp check to enable WoW change detection.</li>
+        <li><strong>Data quality:</strong> 6 of 6 targeted comps captured with structured rate data. Strong baseline.</li>
+        <li><strong>Recommended next step #1:</strong> Walk subject inventory to confirm CC 5×5 actual unit count before pulling the trigger on the $18 → $48 move — the single largest revenue lever in this matrix.</li>
+        <li><strong>Recommended next step #2:</strong> Re-run in 7 days to see whether PSA Stough's small-CC promo pricing tightens or loosens.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div>ASSI LLC · Internal Use Only</div>
+    <div>self-storage-comp-rates · v1.0 · 2026-05-21</div>
+  </div>
+
+</div>
+
+</body>
+</html>

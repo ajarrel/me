@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Homebuilder Benchmark Intelligence — 2026 Spring</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0f1117; --panel:#171a22; --panel2:#1d212b; --line:#2a2f3a;
+    --ink:#e8eaf0; --muted:#9aa3b2; --dim:#6b7480;
+    --amber:#f5a623; --green:#7ed321; --red:#e74c3c; --gray:#8a93a3;
+    --dhi:#4e9af1; --len:#f5a623; --nvr:#7ed321; --tmhc:#9b59b6;
+    --kbh:#e74c3c; --tol:#1abc9c; --phm:#ec5fa8; --mth:#f6d743; --median:#ffffff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:'IBM Plex Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    line-height:1.55;font-size:15px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1180px;margin:0 auto;padding:32px 22px 80px}
+  .mono{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace}
+  header.masthead{border-bottom:1px solid var(--line);padding-bottom:22px;margin-bottom:8px}
+  .kicker{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.28em;
+    text-transform:uppercase;color:var(--amber);margin:0 0 10px}
+  h1{font-size:34px;line-height:1.1;font-weight:700;margin:0 0 14px;letter-spacing:-.01em}
+  h1 .em{color:var(--amber)}
+  .scope{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);
+    background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+  .scope b{color:var(--ink);font-weight:600}
+  section{margin-top:46px;scroll-margin-top:20px}
+  .sec-no{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--dim);letter-spacing:.2em}
+  h2{font-size:23px;font-weight:600;margin:6px 0 4px;letter-spacing:-.01em}
+  h2 .bar{display:inline-block;width:26px;height:3px;background:var(--amber);
+    vertical-align:middle;margin-right:10px;border-radius:2px}
+  h3{font-size:16px;font-weight:600;margin:24px 0 8px;color:var(--ink)}
+  h4{font-size:13.5px;font-weight:600;margin:18px 0 6px;color:var(--muted);
+    font-family:'IBM Plex Mono',monospace;letter-spacing:.04em;text-transform:uppercase}
+  p{margin:10px 0;color:var(--ink)}
+  .lede{color:var(--muted);font-size:15.5px;max-width:80ch}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:18px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}
+  .card .lab{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--amber);margin-bottom:8px}
+  .card .big{font-size:15px;font-weight:600;line-height:1.4}
+  .card .sub{font-size:13px;color:var(--muted);margin-top:6px}
+  table{border-collapse:collapse;width:100%;margin:14px 0;font-size:13px}
+  th,td{padding:7px 9px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+  th:first-child,td:first-child{text-align:left}
+  thead th{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;
+    color:var(--muted);text-transform:uppercase;font-weight:500;background:var(--panel)}
+  tbody tr:hover{background:var(--panel)}
+  td.num{font-family:'IBM Plex Mono',monospace}
+  .g{color:var(--green)} .r{color:var(--red)} .a{color:var(--amber)} .d{color:var(--gray)}
+  .cell-g{background:rgba(126,211,33,.12)} .cell-a{background:rgba(245,166,35,.12)}
+  .cell-r{background:rgba(231,76,60,.13)}
+  .tag{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;
+    padding:2px 7px;border-radius:5px;letter-spacing:.04em}
+  .tag.cau{background:rgba(231,76,60,.16);color:#f3837a}
+  .tag.neu{background:rgba(138,147,163,.16);color:#aab2c0}
+  .tag.con{background:rgba(245,166,35,.16);color:var(--amber)}
+  .tag.bul{background:rgba(126,211,33,.16);color:var(--green)}
+  .read{background:linear-gradient(180deg,rgba(245,166,35,.10),rgba(245,166,35,.04));
+    border:1px solid rgba(245,166,35,.35);border-left:3px solid var(--amber);
+    border-radius:8px;padding:14px 16px;margin:18px 0 4px}
+  .read .lab{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--amber);margin-bottom:6px;font-weight:600}
+  .read p{margin:0;font-size:14px}
+  .chartbox{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:16px 16px 8px;margin:16px 0}
+  .chartbox h4{margin-top:0;color:var(--ink)}
+  .chart-cap{font-size:12px;color:var(--dim);margin:4px 2px 10px}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 10px}
+  .tab{font-family:'IBM Plex Mono',monospace;font-size:11.5px;padding:5px 11px;border-radius:6px;
+    background:var(--panel2);border:1px solid var(--line);color:var(--muted);cursor:pointer}
+  .tab.active{background:rgba(245,166,35,.16);border-color:rgba(245,166,35,.5);color:var(--amber)}
+  .cvs{position:relative;height:340px}
+  .caveat{font-size:12px;color:var(--dim);font-style:italic;margin:6px 0 0}
+  .signal{display:grid;grid-template-columns:1.4fr 1fr 1fr auto;gap:0;font-size:13px;
+    border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:14px 0}
+  .signal div{padding:9px 12px;border-bottom:1px solid var(--line)}
+  .signal .h{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--muted);background:var(--panel)}
+  .flag{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;text-align:center}
+  .watch{color:#f3837a} .monitor{color:var(--amber)} .tail{color:var(--green)}
+  ul.tight{margin:8px 0;padding-left:20px} ul.tight li{margin:5px 0}
+  .note{font-size:12.5px;color:var(--dim);border-top:1px dashed var(--line);padding-top:8px;margin-top:14px}
+  footer{margin-top:60px;border-top:1px solid var(--line);padding-top:18px;
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--dim);line-height:1.7}
+  a.jump{color:var(--muted);text-decoration:none;font-family:'IBM Plex Mono',monospace;font-size:12px}
+  .toc{display:flex;flex-wrap:wrap;gap:6px 16px;margin:16px 0 0}
+  @media(max-width:760px){.grid4{grid-template-columns:1fr 1fr}h1{font-size:26px}
+    .signal{grid-template-columns:1fr;}.signal div{border-bottom:1px solid var(--line)}
+    .cvs{height:300px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="kicker">Homebuilder Benchmark Intelligence · National Ruler</p>
+  <h1>The public builders' <span class="em">spring 2026</span> read — a ruler for a local NC builder</h1>
+  <div class="scope">
+    <b>Scope:</b> 8 fiscal quarters per builder (each builder's own trailing window) · DHI · LEN · NVR · TMHC · KBH · TOL · PHM · MTH ·
+    NC&ndash;Southeast lens · margins-first emphasis · inaugural store build (depth compounds on re-run) ·
+    audience: local NC builder benchmarking itself. <b>Newest prints:</b> DHI&nbsp;Mar'26, LEN&nbsp;Feb'26, NVR&nbsp;Mar'26, TMHC&nbsp;Mar'26, KBH&nbsp;Feb'26, TOL&nbsp;Apr'26, PHM&nbsp;Mar'26, MTH&nbsp;Mar'26.
+  </div>
+  <div class="toc">
+    <a class="jump" href="#s0">00 Exec</a><a class="jump" href="#s1">01 Matrix</a>
+    <a class="jump" href="#s2">02 Charts</a><a class="jump" href="#s3">03 Dispersion</a>
+    <a class="jump" href="#s4">04 Guidance</a><a class="jump" href="#s5">05 Accuracy</a>
+    <a class="jump" href="#s6">06 NC &amp; Ruler</a><a class="jump" href="#s7">07 Early-warning</a>
+  </div>
+</header>
+
+<!-- ============ SECTION 0 ============ -->
+<section id="s0">
+  <div class="sec-no">SECTION 00</div>
+  <h2><span class="bar"></span>The 30-second read</h2>
+  <div class="grid4">
+    <div class="card">
+      <div class="lab">Cycle state</div>
+      <div class="big">Margins compressed across all 8 builders — every one is down YoY.</div>
+      <div class="sub">As-reported home-sales gross margin is now 15&ndash;24%, vs roughly 20&ndash;28% a year ago. Incentives (10&ndash;14% of price) and higher lot costs are doing the damage. Volume is being bought, not given.</div>
+    </div>
+    <div class="card">
+      <div class="lab">Biggest surprise</div>
+      <div class="big">Toll Brothers <em>raised</em> full-year guidance and grew margin while everyone else shrank.</div>
+      <div class="sub">TOL posted a 26.2% adjusted gross margin (beat guide by 70 bps), orders +7%, and lifted FY deliveries — luxury demand has decoupled from the entry-level squeeze.</div>
+    </div>
+    <div class="card">
+      <div class="lab">NC read-through</div>
+      <div class="big">The entry-level names that define NC are protecting price over pace — or paying up for orders.</div>
+      <div class="sub">DHI bought +11% orders with incentives; MTH and TMHC deliberately ceded pace to hold margin. Community counts are still up 4&ndash;17%, so new supply keeps landing in the Triangle/Charlotte.</div>
+    </div>
+    <div class="card">
+      <div class="lab">Early-warning flag</div>
+      <div class="big">New-home months' supply hit 9.4 — the highest in years — while builders keep opening communities.</div>
+      <div class="sub">HMI stuck at 37 (25th straight sub-50 month), 61% of builders cutting/incentivizing, and rates backed up to ~6.4% on the Iran conflict. Supply is building into soft demand.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SECTION 1 ============ -->
+<section id="s1">
+  <div class="sec-no">SECTION 01</div>
+  <h2><span class="bar"></span>Sector snapshot matrix — most recent reported quarter</h2>
+  <p class="lede">Columns align by report recency (each builder's newest print), so period-end months are spread across Feb&ndash;Apr 2026. Cells are color-coded by level within the group; YoY is the primary comparison for builders given spring seasonality.</p>
+
+  <h4>Margins &amp; pricing</h4>
+  <table>
+    <thead><tr><th>Metric (newest qtr)</th><th>DHI</th><th>LEN</th><th>NVR</th><th>TMHC</th><th>KBH</th><th>TOL</th><th>PHM</th><th>MTH</th><th>Median</th><th>Range</th></tr></thead>
+    <tbody>
+      <tr><td>Home-sales gross margin %</td>
+        <td class="num cell-a">20.1</td><td class="num cell-r">15.2</td><td class="num cell-a">19.6</td>
+        <td class="num cell-a">20.0</td><td class="num cell-r">15.3</td><td class="num cell-g">23.9</td>
+        <td class="num cell-g">24.4</td><td class="num cell-r">17.5</td><td class="num">19.8</td><td class="num d">9.2</td></tr>
+      <tr><td>Adjusted gross margin %</td>
+        <td class="num d">&mdash;</td><td class="num d">&mdash;</td><td class="num d">&mdash;</td>
+        <td class="num cell-a">20.6</td><td class="num cell-r">15.5</td><td class="num cell-g">26.2</td>
+        <td class="num d">&mdash;</td><td class="num d">&mdash;</td><td class="num">20.6</td><td class="num d">10.7</td></tr>
+      <tr><td>Δ gross margin YoY (bps)</td>
+        <td class="num r">~-200</td><td class="num r">-350</td><td class="num r">-230</td>
+        <td class="num r">-400+</td><td class="num r">-490</td><td class="num r">-210</td>
+        <td class="num r">-310</td><td class="num r">-450</td><td class="num r">-330</td><td class="num d">280</td></tr>
+      <tr><td>ASP closed ($000)</td>
+        <td class="num">360</td><td class="num">374</td><td class="num">457</td><td class="num">578</td>
+        <td class="num">452</td><td class="num">1,009</td><td class="num">542</td><td class="num">371</td>
+        <td class="num">455</td><td class="num d">649</td></tr>
+      <tr><td>Incentive / buydown load %</td>
+        <td class="num">10</td><td class="num">14</td><td class="num d">&mdash;</td><td class="num d">&mdash;</td>
+        <td class="num d">&mdash;</td><td class="num d">&mdash;</td><td class="num d">&mdash;</td><td class="num d">&mdash;</td>
+        <td class="num">~12</td><td class="num d">&mdash;</td></tr>
+      <tr><td>SG&amp;A % of home-sales rev</td>
+        <td class="num d">&mdash;</td><td class="num">9.8</td><td class="num d">&mdash;</td><td class="num">11.4</td>
+        <td class="num">12.2</td><td class="num">10.3</td><td class="num">11.5</td><td class="num d">&mdash;</td>
+        <td class="num">11.4</td><td class="num d">2.4</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Sales pace &amp; orders</h4>
+  <table>
+    <thead><tr><th>Metric (newest qtr)</th><th>DHI</th><th>LEN</th><th>NVR</th><th>TMHC</th><th>KBH</th><th>TOL</th><th>PHM</th><th>MTH</th><th>Median</th><th>Range</th></tr></thead>
+    <tbody>
+      <tr><td>Net orders YoY %</td>
+        <td class="num g cell-g">+11</td><td class="num a cell-a">+1</td><td class="num g cell-g">+7</td>
+        <td class="num r cell-r">-14</td><td class="num g cell-g">+3</td><td class="num g cell-g">+7</td>
+        <td class="num g cell-g">+3</td><td class="num r cell-r">-5</td><td class="num g">+3</td><td class="num d">25</td></tr>
+      <tr><td>Monthly absorption (orders/comm/mo)</td>
+        <td class="num d">n/a</td><td class="num cell-g">3.7</td><td class="num d">n/a</td><td class="num cell-a">2.7</td>
+        <td class="num cell-g">3.5</td><td class="num cell-r">2.1</td><td class="num cell-a">2.6</td><td class="num cell-g">3.6</td>
+        <td class="num">3.1</td><td class="num d">1.6</td></tr>
+      <tr><td>Cancellation rate %</td>
+        <td class="num">16<sup>g</sup></td><td class="num d">&mdash;</td><td class="num">16.6<sup>g</sup></td><td class="num">9.9<sup>b</sup></td>
+        <td class="num">12<sup>g</sup></td><td class="num">2.9<sup>b</sup></td><td class="num d">&mdash;</td><td class="num">11<sup>g</sup></td>
+        <td class="num">12</td><td class="num d">&mdash;</td></tr>
+      <tr><td>Closings YoY %</td>
+        <td class="num g cell-g">+1</td><td class="num a cell-a">-5</td><td class="num r cell-r">-8</td>
+        <td class="num r cell-r">-26</td><td class="num r cell-r">-14</td><td class="num r cell-r">-14</td>
+        <td class="num a cell-a">-7</td><td class="num a cell-a">-8</td><td class="num r">-8</td><td class="num d">27</td></tr>
+      <tr><td>Backlog units</td>
+        <td class="num d">&mdash;</td><td class="num">15,588</td><td class="num d">&mdash;</td><td class="num">3,465</td>
+        <td class="num">3,604</td><td class="num">5,394</td><td class="num">10,427</td><td class="num d">&mdash;</td>
+        <td class="num">5,394</td><td class="num d">&mdash;</td></tr>
+    </tbody>
+  </table>
+  <p class="caveat"><sup>g</sup> = % of gross orders · <sup>b</sup> = % of beginning backlog. Cancellation bases differ — KBH (build-to-order) and TOL (luxury) structurally run lower; do not rank across bases.</p>
+
+  <h4>Land, community &amp; balance sheet</h4>
+  <table>
+    <thead><tr><th>Metric (newest qtr)</th><th>DHI</th><th>LEN</th><th>NVR</th><th>TMHC</th><th>KBH</th><th>TOL</th><th>PHM</th><th>MTH</th><th>Median</th><th>Range</th></tr></thead>
+    <tbody>
+      <tr><td>Active community count YoY %</td>
+        <td class="num g">+11</td><td class="num d">&mdash;</td><td class="num d">&mdash;</td><td class="num g">+4</td>
+        <td class="num g">+8</td><td class="num g">+9</td><td class="num g">+9</td><td class="num g">+17</td>
+        <td class="num g">+9</td><td class="num d">13</td></tr>
+      <tr><td>% lots optioned</td>
+        <td class="num d">~67</td><td class="num d">land-light</td><td class="num">~100</td><td class="num">51</td>
+        <td class="num">41</td><td class="num d">&mdash;</td><td class="num d">&mdash;</td><td class="num d">&mdash;</td>
+        <td class="num d">&mdash;</td><td class="num d">&mdash;</td></tr>
+      <tr><td>Net debt-to-capital %</td>
+        <td class="num">21.7</td><td class="num d">~net cash</td><td class="num d">~net cash</td><td class="num d">&mdash;</td>
+        <td class="num">32.9</td><td class="num d">low</td><td class="num">12.3</td><td class="num">17.4</td>
+        <td class="num">19.6</td><td class="num d">20.6</td></tr>
+      <tr><td>Diluted EPS ($)</td>
+        <td class="num">2.24</td><td class="num">0.93</td><td class="num">67.76</td><td class="num">1.01</td>
+        <td class="num">0.52</td><td class="num">2.72</td><td class="num">1.79</td><td class="num">0.82</td>
+        <td class="num d">&mdash;</td><td class="num d">&mdash;</td></tr>
+      <tr><td>EPS YoY %</td>
+        <td class="num r">-13</td><td class="num d">&mdash;</td><td class="num r">-29</td><td class="num d">&mdash;</td>
+        <td class="num r">-65</td><td class="num r">-22</td><td class="num r">-30</td><td class="num d">&mdash;</td>
+        <td class="num r">-29</td><td class="num d">&mdash;</td></tr>
+      <tr><td>Buybacks ($M, qtr)</td>
+        <td class="num">904</td><td class="num">237</td><td class="num d">&mdash;</td><td class="num">150</td>
+        <td class="num">50</td><td class="num">175</td><td class="num">308</td><td class="num">130</td>
+        <td class="num">175</td><td class="num d">854</td></tr>
+    </tbody>
+  </table>
+  <p class="caveat">NVR ≈100% optioned and LEN/NVR near net-cash are model features (land-light), not data errors — compare leverage and land metrics only within like models. NVR's ~$68 EPS reflects its very low share count, not outsized profitability per home.</p>
+  <p class="note"><strong>8-quarter trajectory rows:</strong> this is the inaugural store build, so most builders carry the newest quarter plus the year-ago comparative (and select interim quarters). Each re-run adds the freshly reported quarter only, so the full trailing-8 trajectory and sequential rows fill in over the next ~5 quarters with no re-fetching.</p>
+
+  <div class="read"><div class="lab">Benchmark Read</div>
+    <p>The headline ruler is <b>home-sales gross margin: sector median ≈19.8%, range 15.2%&ndash;24.4%</b>. For an entry-level NC builder, the relevant sub-median is the entry tier (DHI/NVR/KBH/MTH) at <b>≈18.6%</b>. A local builder printing below ~17.5% this spring is lagging the publics on pricing/cost discipline; above ~21% is genuinely outperforming the entry-level group.</p>
+  </div>
+</section>
+
+<!-- ============ SECTION 2 ============ -->
+<section id="s2">
+  <div class="sec-no">SECTION 02</div>
+  <h2><span class="bar"></span>Trend visualizations</h2>
+  <p class="lede">Charts ordered by emphasis. With an inaugural store, the margin and pace charts show the newest quarter against the year-ago quarter (the cleanest YoY read); cross-builder snapshots use the most recent print.</p>
+
+  <div class="chartbox">
+    <h4>Chart A · Gross margin — newest quarter vs a year ago</h4>
+    <div class="chart-cap">As-reported home-sales gross margin. Every builder compressed; the entry-level names (LEN, KBH, MTH) sit lowest.</div>
+    <div class="cvs"><canvas id="cA"></canvas></div>
+  </div>
+
+  <div class="chartbox">
+    <h4>Chart B · Monthly absorption pace (newest quarter)</h4>
+    <div class="chart-cap">Net orders per active community per month. DHI and NVR don't report a comparable community/pace figure. White dashed line = reporting-builder median (3.1).</div>
+    <div class="cvs"><canvas id="cB"></canvas></div>
+  </div>
+
+  <div class="chartbox">
+    <h4>Chart C · ASP vs. gross margin (newest quarter)</h4>
+    <div class="chart-cap">Bubble = builder. X = average closed price ($000), Y = gross margin %. The luxury/move-up tier (TOL, PHM, TMHC) clusters high-right; entry-level clusters low-left.</div>
+    <div class="cvs"><canvas id="cC"></canvas></div>
+  </div>
+
+  <div class="chartbox">
+    <h4>Chart D · The pace divergence — net orders YoY (newest quarter)</h4>
+    <div class="chart-cap">Who bought volume (green) and who chose price over pace (red). 6 of 8 grew orders; TMHC and MTH deliberately did not.</div>
+    <div class="cvs"><canvas id="cD"></canvas></div>
+  </div>
+
+  <div class="chartbox">
+    <h4>Chart E · Margin vs. pace scatter (newest quarter)</h4>
+    <div class="chart-cap">X = absorption pace, Y = gross margin %. Upper-left = holding price at lower velocity; lower-right = buying velocity with price. The frontier a local builder wants to push toward is up-and-right.</div>
+    <div class="cvs"><canvas id="cE"></canvas></div>
+  </div>
+
+  <div class="read"><div class="lab">Benchmark Read</div>
+    <p>The cleanest single picture is Chart E: <b>no public builder is holding both high margin and high pace this spring</b>. The group is trading one for the other along a downward-sloping frontier. A local builder's job is to sit on or above that frontier for its tier — entry-level reference point ≈18.6% margin at ≈3.5 absorption (KBH/MTH zone).</p>
+  </div>
+</section>
+
+<!-- ============ SECTION 3 ============ -->
+<section id="s3">
+  <div class="sec-no">SECTION 03</div>
+  <h2><span class="bar"></span>Cross-builder dispersion &amp; consensus</h2>
+
+  <h4>3A · Direction consensus (newest quarter, YoY)</h4>
+  <table>
+    <thead><tr><th>Metric</th><th>Positive</th><th>Negative</th><th>Call</th></tr></thead>
+    <tbody>
+      <tr><td>Gross margin</td><td class="num">0</td><td class="num r">8</td><td><span class="tag cau">Consensus down</span></td></tr>
+      <tr><td>Net orders</td><td class="num g">6</td><td class="num r">2</td><td><span class="tag neu">Split (price-vs-pace)</span></td></tr>
+      <tr><td>Closings</td><td class="num g">1</td><td class="num r">7</td><td><span class="tag cau">Consensus down</span></td></tr>
+      <tr><td>Community count</td><td class="num g">6</td><td class="num">0</td><td><span class="tag bul">Consensus up</span></td></tr>
+      <tr><td>EPS</td><td class="num">0</td><td class="num r">5</td><td><span class="tag cau">Consensus down</span></td></tr>
+    </tbody>
+  </table>
+  <p class="caveat">Counts use builders that report each metric on a comparable basis; community-count "positive" counts the six builders disclosing a clean YoY.</p>
+
+  <h4>3B · Where the group converges vs. diverges</h4>
+  <p><b>Converging (sector dynamics dominate):</b> the <em>direction</em> of margins and earnings — all eight builders are absorbing the same incentive-and-lot-cost squeeze, and all are still adding communities. That uniformity says the pressure is macro, not operator-specific.</p>
+  <p><b>Diverging (strategy is the story):</b> the <em>level</em> of margin and the <em>orders</em> response. Gross-margin spread is a wide 9.2 points (15.2% LEN → 24.4% PHM), driven mostly by price tier. And builders split cleanly into "buy the order" (DHI +11%, NVR +7%, TOL +7%) vs. "defend the margin" (TMHC −14%, MTH −5%). The outlier on the right tail is <b>Toll Brothers</b> — the only builder to expand margin guidance.</p>
+
+  <h4>3C · Outlier spotlight — Toll Brothers</h4>
+  <p>TOL is the most differentiated builder this quarter: a 26.2% adjusted gross margin, orders +7%, and a <em>raised</em> full-year delivery and margin outlook while peers trimmed. Two drivers: (1) luxury/move-up buyers are far less rate-sensitive than entry-level, so TOL didn't have to buy volume with incentives; and (2) a deliberate spec discipline (finished specs cut to ~2 per community) that protected price. The read for everyone else is that the pain is concentrated at the affordability-constrained entry level — exactly where most NC volume sits.</p>
+
+  <div class="read"><div class="lab">Benchmark Read</div>
+    <p>This quarter a local NC builder should <b>track the consensus, not the outlier</b>: TOL's luxury insulation doesn't transfer to a Triangle/Charlotte entry or first-move-up operator. The relevant signal is the entry-level group's −330 bps median margin hit and the price-vs-pace fork — decide which side of that fork you're on, explicitly.</p>
+  </div>
+</section>
+
+<!-- ============ SECTION 4 ============ -->
+<section id="s4">
+  <div class="sec-no">SECTION 04</div>
+  <h2><span class="bar"></span>Forward guidance &amp; tone</h2>
+
+  <h4>4A · Full-year (or next-quarter) guidance, newest prints</h4>
+  <table>
+    <thead><tr><th>Builder</th><th>FY deliveries</th><th>Gross margin guide</th><th>ASP guide</th><th>Tone</th></tr></thead>
+    <tbody>
+      <tr><td>DHI (FY26)</td><td class="num">86,000&ndash;87,500</td><td class="num">~19.7&ndash;20.2 (Q3)</td><td class="num d">&mdash;</td><td><span class="tag neu">Neutral</span></td></tr>
+      <tr><td>LEN (Q2 FY26)</td><td class="num">20,000&ndash;21,000</td><td class="num">15.5&ndash;16.0</td><td class="num">370&ndash;375k</td><td><span class="tag cau">Cautious</span></td></tr>
+      <tr><td>NVR</td><td class="num d">no formal guide</td><td class="num d">&mdash;</td><td class="num d">&mdash;</td><td><span class="tag neu">Neutral</span></td></tr>
+      <tr><td>TMHC (FY26)</td><td class="num">~11,000</td><td class="num">≥20 (Q2)</td><td class="num">580&ndash;590k</td><td><span class="tag con">Constructive</span></td></tr>
+      <tr><td>KBH (FY26)</td><td class="num">10,000&ndash;11,500</td><td class="num">15.0&ndash;15.6 (Q2)</td><td class="num d">&mdash;</td><td><span class="tag neu">Neutral</span></td></tr>
+      <tr><td>TOL (FY26)</td><td class="num g">10,400&ndash;10,700 ↑</td><td class="num g">26.1 adj ↑</td><td class="num">985k&ndash;1.0M</td><td><span class="tag bul">Bullish</span></td></tr>
+      <tr><td>PHM (FY26)</td><td class="num">28,500&ndash;29,000</td><td class="num">24.5&ndash;25.0 (low end)</td><td class="num">550&ndash;560k</td><td><span class="tag neu">Neutral</span></td></tr>
+      <tr><td>MTH (FY26)</td><td class="num d">~entry-level vol</td><td class="num d">held; margin-over-pace</td><td class="num d">&mdash;</td><td><span class="tag cau">Cautious</span></td></tr>
+    </tbody>
+  </table>
+
+  <h4>4B · Sector consensus outlook</h4>
+  <p>The implied full-year direction is <b>flat-to-down volume with margins bottoming in 1H and trying to stabilize in 2H</b> — Lennar explicitly called its 15.2% Q1 the low point; KBH and PHM are leaning on a build-to-order mix shift to lift back-half margin. <b>Most bullish:</b> Toll, betting on rate-insulated luxury demand and community growth. <b>Most cautious:</b> Lennar (production-first, lowest margin) and Meritage (winter storm + rate shock, choosing margin over a 4/month pace).</p>
+
+  <h4>4C · Pending corporate events</h4>
+  <ul class="tight">
+    <li><b>Lennar / Millrose:</b> the early-2025 land-banking spin-off keeps making LEN's balance sheet non-comparable to owned-land peers; watch land-spend and optioned-share disclosures.</li>
+    <li><b>Toll / Buffington Homes:</b> acquisition extends TOL into Northwest Arkansas and is baked into the raised 480&ndash;490 year-end community count.</li>
+    <li><b>PulteGroup buyback:</b> board added $1.5B to the authorization (to ~$2.1B remaining) — a confidence signal amid the margin dip.</li>
+    <li><b>Build-to-order pivots:</b> KBH (→70% BTO 2H) and PHM (43%→~60% BTO) are both repositioning the spec/BTO mix, which should raise back-half margin but slow near-term conversion.</li>
+  </ul>
+
+  <div class="read"><div class="lab">Benchmark Read</div>
+    <p>The guidance band implies a local NC builder should plan next year on <b>flat-to-slightly-down volume and gross margins in the high-teens to low-20s for entry/first-move-up</b> — not a snap-back. If you're modeling a 2H margin recovery, tie it to a concrete mix or cost lever (BTO shift, lot-cost relief), because the publics are only guiding stabilization, not expansion.</p>
+  </div>
+</section>
+
+<!-- ============ SECTION 5 ============ -->
+<section id="s5">
+  <div class="sec-no">SECTION 05</div>
+  <h2><span class="bar"></span>Guidance accuracy tracking (two-year lookback)</h2>
+  <p class="lede">This section scores prior full-year guidance midpoints against actuals. Because this is the inaugural store build, the FY2026 guidance midpoints below are now <em>retained</em> in <span class="mono">benchmarks.json</span>; they'll be scored against actuals as each fiscal year closes, and the FY24/FY25 lookback fills in on the next run with prior-year filings.</p>
+  <table>
+    <thead><tr><th>Builder</th><th>FY26 deliveries (mid)</th><th>FY26 GM guide (mid)</th><th>Revision so far</th><th>Pattern (building)</th></tr></thead>
+    <tbody>
+      <tr><td>DHI</td><td class="num">86,750</td><td class="num d">&mdash;</td><td class="d">trimmed revenue range</td><td class="d">to be scored</td></tr>
+      <tr><td>TMHC</td><td class="num">11,000</td><td class="num">20.0</td><td class="d">held</td><td class="d">to be scored</td></tr>
+      <tr><td>KBH</td><td class="num">10,750</td><td class="num d">15.3 (Q2)</td><td class="d">held</td><td class="d">to be scored</td></tr>
+      <tr><td>TOL</td><td class="num g">10,550 ↑</td><td class="num g">26.1 ↑</td><td class="g">raised both</td><td class="d">to be scored</td></tr>
+      <tr><td>PHM</td><td class="num">28,750</td><td class="num a">24.75 → low end</td><td class="a">GM guided to low end</td><td class="d">to be scored</td></tr>
+    </tbody>
+  </table>
+  <p>Directionally this run: <b>Toll is the only builder revising up</b>, PulteGroup nudged its margin guide to the low end, and DHI trimmed its revenue range — an early tell that, of this group, <b>Toll's guidance is currently the most credible upside anchor and the entry-level guides carry the most downside risk</b>. A proper Beat/Met/Missed scoring requires the closed-year actuals, which the store will accumulate.</p>
+  <div class="read"><div class="lab">Benchmark Read</div>
+    <p>Until two closed years are scored, treat <b>Toll's and NVR's track records as the most reliable anchors</b> (historically disciplined guiders) and discount mid-year-raised entry-level guides. Re-run after FY2026 closes to convert this into a hard Beat/Met/Missed pattern.</p>
+  </div>
+</section>
+
+<!-- ============ SECTION 6 ============ -->
+<section id="s6">
+  <div class="sec-no">SECTION 06</div>
+  <h2><span class="bar"></span>NC market &amp; benchmark intelligence</h2>
+
+  <h4>6A · NC / Southeast segment signals</h4>
+  <p>None of the eight broke out a clean Raleigh or Charlotte number this quarter, so the read is through the East/Southeast segments and product tier. <b>DHI</b> (East/Southeast, #1 in Raleigh) is the single most important NC volume read — entry-level orders +11% bought with ~10% incentives. <b>NVR</b> (Ryan Homes, Mid-Atlantic/SouthEast) and <b>Meritage</b> (East) are the closest pure entry-level Carolinas comps: NVR orders +7% at a flat-ish margin (19.6%), MTH orders −5% as it chose margin (17.5%) over a 4/month pace. <b>PulteGroup</b> (Southeast: Pulte/Centex/Del Webb) and <b>TMHC</b> (East) carry the first-move-up and active-adult read for Charlotte and the Triangle; <b>Toll</b> covers the move-up/luxury tier most local entry operators don't compete in.</p>
+
+  <h4>6B · Demand drivers (fresh NC figures)</h4>
+  <ul class="tight">
+    <li><b>Migration:</b> NC added ~145,000&ndash;150,000 residents in the year to mid-2025 (pop. 11.2M), the <b>3rd-largest state gain</b> and <b>#1 for domestic in-migration</b> (Census). Charlotte gained ~21,000 — the most of any major U.S. city — and Raleigh crossed 500,000 for the first time.</li>
+    <li><b>Affordability:</b> NC statewide median ≈$378,000 (Feb '26, +2.5% YoY, Redfin); Charlotte median ≈$444,000 with sub-$300k homes now under 18% of sales — the affordability gap the entry builders are chasing with incentives.</li>
+    <li><b>Inventory normalizing:</b> NC entered 2026 with ~57,000 listings (+9.3% YoY) and ~5 months of supply — looser than the national existing-home 4.4 months, tighter than the 9.4-month <em>new-home</em> overhang.</li>
+    <li><b>Permits cooling:</b> Wake County issued 8,113 residential permits in 2025, down from 9,472 in 2024 — a real slowdown in the Triangle's new-supply engine even as long-run need is 125,000&ndash;175,000 units over 10&ndash;15 years.</li>
+  </ul>
+
+  <h4>6C · Supply &amp; community pipeline</h4>
+  <p>Community-count growth is broad — DHI +11%, MTH +17%, TOL/PHM +9%, KBH +8%, TMHC +4%. That means the publics are <em>still adding</em> selling communities into the Carolinas corridors even as absorption softens, which keeps competitive new-supply pressure rising in the Triangle and Charlotte. Realtor.com's 2026 forecast cooling Charlotte (14th→70th) and Raleigh (72nd→95th) is consistent with that: maturation, more buyer choice, longer days-on-market — not collapse. Wake County's permit pullback is the counterweight keeping it from tipping into oversupply.</p>
+
+  <h4>6D · The Ruler — sector median &amp; range (newest quarter)</h4>
+  <table>
+    <thead><tr><th>Metric</th><th>Sector median</th><th>Range (low&ndash;high)</th><th>Entry-tier reference</th></tr></thead>
+    <tbody>
+      <tr><td>Home-sales gross margin %</td><td class="num">19.8</td><td class="num">15.2&ndash;24.4</td><td class="num a">~18.6</td></tr>
+      <tr><td>Monthly absorption pace</td><td class="num">3.1</td><td class="num">2.1&ndash;3.7</td><td class="num a">~3.5</td></tr>
+      <tr><td>ASP of homes closed ($000)</td><td class="num">455</td><td class="num">360&ndash;1,009</td><td class="num a">~370&ndash;460</td></tr>
+      <tr><td>Cancellation rate % (gross-order basis)</td><td class="num">12</td><td class="num">11&ndash;16.6</td><td class="num a">11&ndash;16</td></tr>
+      <tr><td>SG&amp;A % of home-sales rev</td><td class="num">11.4</td><td class="num">9.8&ndash;12.2</td><td class="num a">~12</td></tr>
+      <tr><td>Community-count growth YoY %</td><td class="num">+9</td><td class="num">+4 to +17</td><td class="num a">+8 to +17</td></tr>
+      <tr><td>Net debt-to-capital %</td><td class="num">~19.6</td><td class="num">~0&ndash;32.9</td><td class="num a">12&ndash;33</td></tr>
+    </tbody>
+  </table>
+  <p class="caveat"><b>How to read this against a local builder:</b> hold your own numbers next to the <em>entry-tier reference</em> column, not the blended median (which TOL's luxury mix and PHM's Del Webb lift). A Triangle entry/first-move-up builder below ~17.5% gross margin or under ~3.0 absorption is lagging the comparable publics; matching ~18&ndash;20% margin at ~3.5 absorption is squarely competitive this spring.</p>
+
+  <div class="read"><div class="lab">Benchmark Read</div>
+    <p>The two metrics a local NC builder most needs to match or beat right now: <b>(1) gross margin vs. the ~18.6% entry-tier median</b> — protect it with mix/cost, not just price; and <b>(2) absorption pace vs. ~3.5</b> — because with community counts still climbing, the local edge is selling through faster than the nationals can in your specific submarkets.</p>
+  </div>
+</section>
+
+<!-- ============ SECTION 7 ============ -->
+<section id="s7">
+  <div class="sec-no">SECTION 07</div>
+  <h2><span class="bar"></span>Macro &amp; early-warning signals</h2>
+  <p class="lede">The "see it coming" layer — fresh national signals with an NC flag each.</p>
+
+  <div class="signal">
+    <div class="h">Signal</div><div class="h">Current reading</div><div class="h">Direction</div><div class="h">NC flag</div>
+    <div>NAHB/Wells Fargo HMI</div><div class="mono">37 (May), 25th straight &lt;50</div><div class="mono">↑ +3 m/m, low</div><div class="flag monitor">🟡 Monitor</div>
+    <div>HMI buyer-traffic sub-index</div><div class="mono">25</div><div class="mono">↑ +3, still weak</div><div class="flag watch">🔴 Watch</div>
+    <div>Builders cutting price / incentivizing</div><div class="mono">32% cut · 61% incentivize</div><div class="mono">→ 14th mo ≥60%</div><div class="flag monitor">🟡 Monitor</div>
+    <div>Freddie Mac 30-yr fixed</div><div class="mono">~6.4% (May avg 6.41)</div><div class="mono">↑ +36 bps on Iran</div><div class="flag watch">🔴 Watch</div>
+    <div>New-home months' supply</div><div class="mono">9.4 (Apr)</div><div class="mono">↑ from 8.6 yr-ago</div><div class="flag watch">🔴 Watch</div>
+    <div>New-home sales (SAAR)</div><div class="mono">622k (Apr)</div><div class="mono">↓ −11.3% YoY</div><div class="flag watch">🔴 Watch</div>
+    <div>Existing-home inventory</div><div class="mono">4.4 mo · 2.6 mo (FRED SF)</div><div class="mono">→ still tight (lock-in)</div><div class="flag tail">🟢 Tailwind</div>
+    <div>NC net in-migration</div><div class="mono">~145&ndash;150k/yr, #1 domestic</div><div class="mono">→ steady</div><div class="flag tail">🟢 Tailwind</div>
+    <div>Wake County permits</div><div class="mono">8,113 (2025)</div><div class="mono">↓ from 9,472 (2024)</div><div class="flag monitor">🟡 Monitor</div>
+  </div>
+
+  <p>The macro picture is a tug-of-war: <b>demand-side red flags</b> (rates backing up on the Iran conflict, new-home supply at 9.4 months, sales −11% YoY, builder traffic stuck at 25) against <b>structural NC tailwinds</b> (top-ranked in-migration, a frozen resale market locking 85% of owners into sub-5% mortgages, so new construction stays a disproportionate share of available supply). NAHB expects rates to stay slightly above 6% through 2026 with sub-6% unlikely before 2027.</p>
+
+  <p><b>What a nimble local builder can do now that the publics can't:</b> the nationals are committed to community-count growth and even-flow production set quarters ago — they can't easily slow starts in a single soft submarket. A local operator can (1) pace starts community-by-community to the actual Triangle/Charlotte absorption instead of a national plan, avoiding the spec overhang the publics are now working off; (2) redeploy incentive dollars into the specific buydown structures that move <em>your</em> price band rather than a blanket 10&ndash;14% load; and (3) lock lots opportunistically while the publics pull back land spend (KBH −38%, TMHC's optioned share rising) — counter-cyclical lot control is the local advantage when the giants are de-risking.</p>
+
+  <div class="read"><div class="lab">Benchmark Read · Overall</div>
+    <p>The cycle is in a <b>soft, supply-heavy trough with margins bottoming and rates the swing factor</b> — not a downturn, but not a recovery either. The single biggest thing a local NC builder should act on this quarter: <b>pace starts to real submarket absorption and defend gross margin toward the ~18.6% entry-tier ruler</b>, rather than chasing the volume the nationals are buying with incentives into a 9.4-month supply.</p>
+  </div>
+</section>
+
+<footer>
+  Prepared 2026-06-09 · National benchmark ruler — not a local-company evaluation.<br>
+  Sources: company 8-K / 10-Q / earnings releases (SEC EDGAR) for DHI, LEN, NVR, TMHC, KBH, TOL, PHM, MTH; NAHB/Wells Fargo HMI; U.S. Census &amp; HUD New Residential Sales; Freddie Mac PMMS; NAR; U.S. Census population estimates; Wake County. Figures as-reported; fiscal periods labeled by period-end month. Margin definitions differ by builder (state basis when comparing).
+</footer>
+
+</div>
+
+<script>
+const C={dhi:'#4e9af1',len:'#f5a623',nvr:'#7ed321',tmhc:'#9b59b6',kbh:'#e74c3c',tol:'#1abc9c',phm:'#ec5fa8',mth:'#f6d743',med:'#ffffff',ink:'#e8eaf0',grid:'#2a2f3a',mut:'#9aa3b2'};
+Chart.defaults.color=C.mut;
+Chart.defaults.font.family="'IBM Plex Mono', monospace";
+Chart.defaults.font.size=11;
+const labels=['DHI','LEN','NVR','TMHC','KBH','TOL','PHM','MTH'];
+const palette=[C.dhi,C.len,C.nvr,C.tmhc,C.kbh,C.tol,C.phm,C.mth];
+const gridcfg={grid:{color:C.grid},ticks:{color:C.mut}};
+
+// Chart A: GM now vs year ago
+new Chart(document.getElementById('cA'),{type:'bar',
+  data:{labels,datasets:[
+    {label:'Newest quarter',data:[20.1,15.2,19.6,20.0,15.3,23.9,24.4,17.5],backgroundColor:palette,borderRadius:3},
+    {label:'Year ago',data:[22.0,18.7,21.9,24.7,20.2,26.0,27.5,22.0],backgroundColor:'rgba(255,255,255,0.18)',borderRadius:3}
+  ]},
+  options:{maintainAspectRatio:false,plugins:{legend:{labels:{color:C.ink}}},
+    scales:{y:{...gridcfg,title:{display:true,text:'Gross margin %',color:C.mut},suggestedMin:10,suggestedMax:30},x:gridcfg}}});
+
+// Chart B: absorption (reporting builders), median 3.1
+new Chart(document.getElementById('cB'),{type:'bar',
+  data:{labels:['LEN','MTH','KBH','TMHC','PHM','TOL'],
+    datasets:[{label:'Absorption (orders/comm/mo)',data:[3.7,3.6,3.5,2.7,2.6,2.1],
+      backgroundColor:[C.len,C.mth,C.kbh,C.tmhc,C.phm,C.tol],borderRadius:3}]},
+  options:{maintainAspectRatio:false,plugins:{legend:{display:false},
+    annotation:{}},
+    scales:{y:{...gridcfg,suggestedMin:0,suggestedMax:4.2,title:{display:true,text:'orders / community / month',color:C.mut}},x:gridcfg}}});
+
+// Chart C: ASP vs GM bubble
+new Chart(document.getElementById('cC'),{type:'bubble',
+  data:{datasets:labels.map((l,i)=>({label:l,
+    data:[{x:[360,374,457,578,452,1009,542,371][i],y:[20.1,15.2,19.6,20.0,15.3,23.9,24.4,17.5][i],r:9}],
+    backgroundColor:palette[i]+'cc',borderColor:palette[i]}))},
+  options:{maintainAspectRatio:false,plugins:{legend:{labels:{color:C.ink,boxWidth:10}}},
+    scales:{x:{...gridcfg,title:{display:true,text:'ASP closed ($000)',color:C.mut}},
+      y:{...gridcfg,title:{display:true,text:'gross margin %',color:C.mut},suggestedMin:12,suggestedMax:28}}}});
+
+// Chart D: orders YoY
+const oy=[11,1,7,-14,3,7,3,-5];
+new Chart(document.getElementById('cD'),{type:'bar',
+  data:{labels,datasets:[{label:'Net orders YoY %',data:oy,
+    backgroundColor:oy.map(v=>v>=0?'#7ed321':'#e74c3c'),borderRadius:3}]},
+  options:{maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{y:{...gridcfg,title:{display:true,text:'YoY %',color:C.mut}},x:gridcfg}}});
+
+// Chart E: margin vs pace scatter (reporting pace builders + plot all with pace where known)
+const eMap=[['LEN',3.7,15.2],['MTH',3.6,17.5],['KBH',3.5,15.3],['TMHC',2.7,20.0],['PHM',2.6,24.4],['TOL',2.1,23.9]];
+const eColors={LEN:C.len,MTH:C.mth,KBH:C.kbh,TMHC:C.tmhc,PHM:C.phm,TOL:C.tol};
+new Chart(document.getElementById('cE'),{type:'scatter',
+  data:{datasets:eMap.map(d=>({label:d[0],data:[{x:d[1],y:d[2]}],
+    backgroundColor:eColors[d[0]],pointRadius:8,pointHoverRadius:10}))},
+  options:{maintainAspectRatio:false,plugins:{legend:{labels:{color:C.ink,boxWidth:10}}},
+    scales:{x:{...gridcfg,title:{display:true,text:'absorption pace (orders/comm/mo)',color:C.mut},suggestedMin:1.5,suggestedMax:4},
+      y:{...gridcfg,title:{display:true,text:'gross margin %',color:C.mut},suggestedMin:12,suggestedMax:28}}}});
+</script>
+</body>
+</html>

@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Self-Storage REIT Intelligence — Q1 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #0f1117;
+  --bg2: #161922;
+  --bg3: #1d2230;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.16);
+  --text1: #e8eaf0;
+  --text2: #a6acbb;
+  --text3: #6c7385;
+  --accent: #f5a623;
+  --psa: #4e9af1;
+  --exr: #f5a623;
+  --cube: #7ed321;
+  --nsa: #9b59b6;
+  --sma: #e74c3c;
+  --median: #ffffff;
+  --green: #2ecc71;
+  --red: #e74c3c;
+  --amber: #f5a623;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: var(--bg);
+  color: var(--text1);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+body { padding: 32px 28px 80px; max-width: 1320px; margin: 0 auto; }
+
+/* Header */
+.header {
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 28px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 24px;
+}
+.eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+h1 {
+  font-family: 'IBM Plex Serif', serif;
+  font-weight: 500;
+  font-size: 34px;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+.subtitle { color: var(--text2); font-size: 14px; max-width: 720px; }
+.meta {
+  text-align: right;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--text3);
+  line-height: 1.7;
+}
+.meta b { color: var(--text2); font-weight: 500; }
+
+/* Scope bar */
+.scope {
+  background: linear-gradient(90deg, rgba(245,166,35,0.08), rgba(245,166,35,0.0));
+  border-left: 2px solid var(--accent);
+  padding: 12px 16px;
+  margin-bottom: 32px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+.scope b { color: var(--text1); font-weight: 500; }
+
+/* Section header */
+.section-header {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text3);
+  border-top: 1px solid var(--border);
+  padding-top: 24px;
+  padding-bottom: 16px;
+  margin-top: 36px;
+}
+.section-header span { color: var(--accent); margin-right: 12px; }
+
+/* Executive summary */
+.exec-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 12px;
+}
+.exec-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 20px 22px;
+}
+.exec-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+.exec-card h3 {
+  font-family: 'IBM Plex Serif', serif;
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: -0.005em;
+  line-height: 1.3;
+  margin-bottom: 8px;
+}
+.exec-card p { color: var(--text2); font-size: 13px; }
+
+/* Tables */
+.table-block { margin-bottom: 18px; }
+.table-title {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--text2);
+  margin-bottom: 8px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+th {
+  text-align: right;
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--text3);
+  border-bottom: 1px solid var(--border2);
+  padding: 8px 10px;
+  background: var(--bg2);
+}
+th:first-child { text-align: left; }
+td {
+  text-align: right;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text1);
+}
+td:first-child { text-align: left; color: var(--text2); font-weight: 500; }
+tbody tr:hover { background: var(--bg2); }
+tr.highlight td { background: rgba(245,166,35,0.06); color: var(--text1); font-weight: 500; }
+tr.summary td { color: var(--text2); font-style: italic; font-size: 11px; border-top: 1px solid var(--border2); border-bottom: none; }
+
+/* Color coding */
+.pos { color: var(--green); }
+.neg { color: var(--red); }
+.flat { color: var(--text3); }
+.arrow-up { color: var(--green); }
+.arrow-dn { color: var(--red); }
+.arrow-flat { color: var(--text3); }
+
+.psa-cell { color: var(--psa); }
+.exr-cell { color: var(--exr); }
+.cube-cell { color: var(--cube); }
+.nsa-cell { color: var(--nsa); }
+.sma-cell { color: var(--sma); }
+
+th.psa-cell, th.exr-cell, th.cube-cell, th.nsa-cell, th.sma-cell { font-weight: 600; }
+
+/* Chart cards */
+.chart-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.chart-row-full { display: block; margin-bottom: 16px; }
+.chart-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 18px 20px 20px;
+}
+.chart-title {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--text1);
+  margin-bottom: 2px;
+}
+.chart-subtitle {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.chart-canvas-wrap { position: relative; height: 280px; }
+
+/* Legend */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--text2);
+  letter-spacing: 0.04em;
+}
+.legend-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+/* So what callout */
+.so-what {
+  background: rgba(245,166,35,0.06);
+  border-left: 2px solid var(--accent);
+  padding: 14px 18px;
+  margin: 16px 0 6px;
+  border-radius: 0 4px 4px 0;
+  font-size: 13px;
+  color: var(--text1);
+  line-height: 1.55;
+}
+.so-what b {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 500;
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* Tone badges */
+.tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 3px;
+  display: inline-block;
+}
+.tag-caut { background: rgba(231,76,60,0.14); color: #ff8b7a; }
+.tag-neut { background: rgba(166,172,187,0.14); color: var(--text2); }
+.tag-cons { background: rgba(126,211,33,0.14); color: var(--cube); }
+.tag-bull { background: rgba(46,204,113,0.16); color: var(--green); }
+.tag-na   { background: rgba(108,115,133,0.20); color: var(--text3); }
+.tag-act  { background: rgba(46,204,113,0.16); color: var(--green); }
+.tag-rel  { background: rgba(245,166,35,0.14); color: var(--amber); }
+.tag-watch{ background: rgba(231,76,60,0.14); color: #ff8b7a; }
+
+/* NC submarket grid */
+.nc-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 14px;
+}
+.nc-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 14px 16px;
+}
+.nc-title {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--exr);
+  margin-bottom: 4px;
+}
+.nc-body { color: var(--text2); font-size: 12px; line-height: 1.55; }
+
+/* Tech adoption rows */
+.tech-row {
+  display: grid;
+  grid-template-columns: 32px 1fr 100px;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  align-items: start;
+}
+.tech-row:last-child { border-bottom: none; }
+.tech-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--text3);
+  padding-top: 2px;
+}
+.tech-name {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 500;
+  color: var(--text1);
+  font-size: 13px;
+  margin-bottom: 3px;
+}
+.tech-body { color: var(--text2); font-size: 12px; line-height: 1.55; }
+.tech-flag { text-align: right; padding-top: 2px; }
+
+/* Footer */
+footer {
+  margin-top: 50px;
+  padding-top: 22px;
+  border-top: 1px solid var(--border);
+  color: var(--text3);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  line-height: 1.7;
+}
+footer b { color: var(--text2); font-weight: 500; }
+
+@media (max-width: 900px) {
+  body { padding: 22px 16px 60px; }
+  .exec-grid { grid-template-columns: 1fr; }
+  .chart-row { grid-template-columns: 1fr; }
+  .nc-grid { grid-template-columns: 1fr; }
+  .header { grid-template-columns: 1fr; }
+  .meta { text-align: left; }
+  h1 { font-size: 26px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="eyebrow">REIT Intelligence · Q1 2026</div>
+    <h1>Self-Storage REIT Earnings Brief</h1>
+    <div class="subtitle">Five-quarter sector intelligence with a North Carolina operator lens — covering PSA, EXR, CUBE, NSA, and SMA.</div>
+  </div>
+  <div class="meta">
+    <b>PREPARED</b> 2026-05-21<br/>
+    <b>AUDIENCE</b> ASSI ownership<br/>
+    <b>HORIZON</b> Q1'25 → Q1'26<br/>
+    <b>LENS</b> NC / Southeast
+  </div>
+</div>
+
+<div class="scope">
+  <b>Scope:</b> 5 quarters (Q1'25 → Q1'26) · PSA / EXR / CUBE / <span style="color:var(--nsa)">NSA (pending PSA acquisition)</span> / SMA · NC–Southeast lens · ASSI ownership audience.<br/>
+  <b>NSA note:</b> Pending acquisition by PSA announced March 16, 2026 (~$10.5B EV, all-stock, ~$41.68/share, expected close Q3 2026). NSA reaffirmed prior 2026 guidance but treat NSA forward outlook as a closing entity.
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 0: EXECUTIVE SUMMARY
+══════════════════════════════════════════ -->
+<div class="section-header"><span>00</span> Executive Summary — the 30-second read</div>
+
+<div class="exec-grid">
+  <div class="exec-card">
+    <div class="exec-tag">Sector State</div>
+    <h3>All five REITs positive on same-store revenue — first time in roughly two years.</h3>
+    <p>Q1'26 prints: EXR +1.8%, SMA +1.5%, CUBE +0.6%, NSA +0.9%, PSA +0.1%. NOI now divides into rate-led recovery (EXR, SMA) and expense-led recovery (NSA, PSA, SMA). CUBE's NOI dragged to −1.5% by weather expenses (snow removal +120 bps alone).</p>
+  </div>
+  <div class="exec-card">
+    <div class="exec-tag">Biggest Surprise</div>
+    <h3>NSA delivered the sector's best NOI (+2.0%) — as a closing acquisition target.</h3>
+    <p>NSA cut same-store opex 3.9% YoY (best in sector), driving +2.0% NOI on just +0.9% revenue. SMA was the only REIT to <b>raise</b> guidance (NOI mid from −40 bps to −25 bps). All others reaffirmed.</p>
+  </div>
+  <div class="exec-card">
+    <div class="exec-tag">NC Read-Through</div>
+    <h3>Charlotte and Raleigh-Cary above-avg 2025 supply, but no REIT named the Triangle as a problem market.</h3>
+    <p>NC 2025 deliveries: Charlotte 3.5% of inventory, Raleigh-Cary 3.3% — both above 2.3% national. Yardi raised 2026 supply forecast May 20. REITs flagged Atlanta/Austin/Dallas/Miami/Phoenix; <b>Carolinas escaped explicit problem-market callouts</b>.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 1: SECTOR SNAPSHOT
+══════════════════════════════════════════ -->
+<div class="section-header"><span>01</span> Sector Snapshot — 5-Quarter Matrix</div>
+
+<div class="table-block">
+  <div class="table-title">Same-Store Ending Occupancy (%)</div>
+  <table>
+    <thead>
+      <tr><th>Quarter</th><th class="psa-cell">PSA</th><th class="exr-cell">EXR</th><th class="cube-cell">CUBE</th><th class="nsa-cell">NSA</th><th class="sma-cell">SMA</th><th>Median</th><th>Range H−L</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Q1'25</td><td>91.5</td><td>93.4</td><td>89.7</td><td>83.6</td><td>93.0</td><td>91.5</td><td class="flat">9.8</td></tr>
+      <tr><td>Q2'25</td><td>92.7</td><td>94.6</td><td>91.1</td><td>85.0</td><td>93.0</td><td>92.7</td><td class="flat">9.6</td></tr>
+      <tr><td>Q3'25</td><td>90.7</td><td>93.7</td><td>89.0</td><td>84.5</td><td>92.4</td><td>90.7</td><td class="flat">9.2</td></tr>
+      <tr><td>Q4'25</td><td>91.0</td><td>92.6</td><td>88.6</td><td>84.0</td><td>92.1</td><td>91.0</td><td class="flat">8.6</td></tr>
+      <tr class="highlight"><td><b>Q1'26</b></td><td><b>91.3</b></td><td><b>93.0</b></td><td><b>89.3</b></td><td><b>84.5</b></td><td><b>92.3</b></td><td><b>91.3</b></td><td class="pos">8.5</td></tr>
+      <tr><td>Seq Δ vs Q4'25</td><td class="arrow-up">↑+30bps</td><td class="arrow-up">↑+40bps</td><td class="arrow-up">↑+70bps</td><td class="arrow-up">↑+50bps</td><td class="arrow-up">↑+20bps</td><td class="arrow-up">↑</td><td class="pos">converging</td></tr>
+      <tr class="summary"><td>5Q trajectory</td><td>Stabilizing</td><td>Stabilizing</td><td>Stabilizing</td><td>Bottoming</td><td>Stabilizing</td><td colspan="2">All five gained sequential occupancy entering rental season</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="table-block">
+  <div class="table-title">Same-Store Revenue Δ YoY (%)</div>
+  <table>
+    <thead>
+      <tr><th>Quarter</th><th class="psa-cell">PSA</th><th class="exr-cell">EXR</th><th class="cube-cell">CUBE</th><th class="nsa-cell">NSA</th><th class="sma-cell">SMA</th><th>Median</th><th>Range H−L</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Q1'25</td><td class="flat">0.0</td><td class="pos">+0.7</td><td class="neg">−0.8</td><td class="neg">−3.2</td><td class="pos">+3.2</td><td>0.0</td><td>6.4</td></tr>
+      <tr><td>Q2'25</td><td class="pos">+0.2</td><td class="pos">+0.4</td><td class="neg">−0.5</td><td class="neg">−3.1</td><td class="pos">+0.4</td><td>+0.2</td><td>3.5</td></tr>
+      <tr><td>Q3'25</td><td class="pos">+0.1</td><td class="flat">0.0</td><td class="neg">−0.9</td><td class="neg">−2.2</td><td class="pos">+2.5</td><td>+0.1</td><td>4.7</td></tr>
+      <tr><td>Q4'25</td><td class="neg">−0.2</td><td class="pos">+0.4</td><td class="neg">−0.1</td><td class="neg">−0.7</td><td class="pos">+0.4</td><td>−0.1</td><td>1.1</td></tr>
+      <tr class="highlight"><td><b>Q1'26</b></td><td class="pos"><b>+0.1</b></td><td class="pos"><b>+1.8</b></td><td class="pos"><b>+0.6</b></td><td class="pos"><b>+0.9</b></td><td class="pos"><b>+1.5</b></td><td class="pos"><b>+0.9</b></td><td>1.7</td></tr>
+      <tr><td>Seq Δ vs Q4'25</td><td class="arrow-up">↑+30bps</td><td class="arrow-up">↑+140bps</td><td class="arrow-up">↑+70bps</td><td class="arrow-up">↑+160bps</td><td class="arrow-up">↑+110bps</td><td class="arrow-up">↑</td><td>—</td></tr>
+      <tr class="summary"><td>5Q trajectory</td><td>Stabilizing</td><td>Accelerating</td><td>Bottoming/+</td><td>Accelerating</td><td>Choppy</td><td colspan="2"><b>First quarter all 5 REITs simultaneously positive on SS revenue in ~2 years</b></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="table-block">
+  <div class="table-title">Same-Store Opex Δ YoY (%) — <span style="color:var(--text3);font-weight:400">lower = better</span></div>
+  <table>
+    <thead>
+      <tr><th>Quarter</th><th class="psa-cell">PSA</th><th class="exr-cell">EXR</th><th class="cube-cell">CUBE</th><th class="nsa-cell">NSA</th><th class="sma-cell">SMA</th><th>Median</th><th>Range H−L</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Q1'25</td><td>+0.1</td><td>+4.2</td><td>+0.6</td><td>+3.7</td><td>+5.5</td><td>+3.7</td><td>5.4</td></tr>
+      <tr><td>Q2'25</td><td>+0.5</td><td class="flat">n/a</td><td>+1.2</td><td>+4.6</td><td>+3.5</td><td>+2.4</td><td>4.1</td></tr>
+      <tr><td>Q3'25</td><td class="pos">−0.6</td><td>+5.8</td><td>+0.3</td><td>+4.9</td><td>+4.5</td><td>+4.5</td><td>6.4</td></tr>
+      <tr><td>Q4'25</td><td>+3.6</td><td>+1.1</td><td>+2.9</td><td class="pos">−0.8</td><td>+2.0</td><td>+2.0</td><td>4.4</td></tr>
+      <tr class="highlight"><td><b>Q1'26</b></td><td class="pos"><b>−1.6</b></td><td><b>+2.7</b></td><td class="neg"><b>+5.8</b></td><td class="pos"><b>−3.9</b></td><td class="pos"><b>+0.6</b></td><td class="pos"><b>+0.6</b></td><td class="neg">9.7</td></tr>
+      <tr><td>Seq Δ vs Q4'25</td><td class="arrow-up">↑−520bps</td><td class="arrow-dn">↓+160bps</td><td class="arrow-dn">↓+290bps</td><td class="arrow-up">↑−310bps</td><td class="arrow-up">↑−140bps</td><td class="arrow-up">↑−140bps</td><td class="neg">diverging</td></tr>
+      <tr class="summary"><td>5Q trajectory</td><td>Volatile/↓</td><td>Volatile</td><td>Accelerating</td><td>Decelerating ↓</td><td>Decelerating ↓</td><td colspan="2">Q1'26 range of 9.7 pts is widest in 5-quarter window — weather + operating leverage variance</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="table-block">
+  <div class="table-title">Same-Store NOI Δ YoY (%)</div>
+  <table>
+    <thead>
+      <tr><th>Quarter</th><th class="psa-cell">PSA</th><th class="exr-cell">EXR</th><th class="cube-cell">CUBE</th><th class="nsa-cell">NSA</th><th class="sma-cell">SMA</th><th>Median</th><th>Range H−L</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Q1'25</td><td class="flat">0.0</td><td class="neg">−1.2</td><td class="neg">−0.8</td><td class="neg">−5.7</td><td class="pos">+2.3</td><td class="neg">−0.8</td><td>8.0</td></tr>
+      <tr><td>Q2'25</td><td class="neg">−1.6</td><td class="neg">−1.1</td><td class="neg">−1.1</td><td class="neg">−5.6</td><td class="neg">−1.1</td><td class="neg">−1.1</td><td>4.5</td></tr>
+      <tr><td>Q3'25</td><td class="pos">+0.2</td><td class="neg">−2.5</td><td class="neg">−1.5</td><td class="neg">−5.7</td><td class="pos">+1.5</td><td class="neg">−1.5</td><td>7.2</td></tr>
+      <tr><td>Q4'25</td><td class="neg">−1.2</td><td class="pos">+0.1</td><td class="neg">−1.1</td><td class="neg">−0.7</td><td class="neg">−0.3</td><td class="neg">−0.7</td><td>1.3</td></tr>
+      <tr class="highlight"><td><b>Q1'26</b></td><td class="pos"><b>+0.5</b></td><td class="pos"><b>+1.2</b></td><td class="neg"><b>−1.5</b></td><td class="pos"><b>+2.0</b></td><td class="pos"><b>+2.0</b></td><td class="pos"><b>+1.2</b></td><td>3.5</td></tr>
+      <tr><td>Seq Δ vs Q4'25</td><td class="arrow-up">↑+170bps</td><td class="arrow-up">↑+110bps</td><td class="arrow-dn">↓−40bps</td><td class="arrow-up">↑+270bps</td><td class="arrow-up">↑+230bps</td><td class="arrow-up">↑+190bps</td><td>—</td></tr>
+      <tr class="summary"><td>5Q trajectory</td><td>Accelerating</td><td>Accelerating</td><td>Choppy</td><td>Accelerating</td><td>Accelerating</td><td colspan="2"><b>4 of 5 REITs positive on SS NOI — first time since mid-2023</b></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="so-what">
+  <b>So What for ASSI</b>
+  The Q1'26 tape is the most constructive sector read since 2023 — every public REIT is now growing same-store revenue, and 4 of 5 are growing same-store NOI. ASSI's Triangle/Wake suburban portfolio sits in markets the REITs are <i>not</i> calling out as Sun Belt problem markets; the question isn't whether the cycle has turned, but whether ASSI's submarkets get there a quarter or two later than the national median.
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 2: TREND VISUALIZATIONS
+══════════════════════════════════════════ -->
+<div class="section-header"><span>02</span> Trend Visualizations</div>
+
+<div class="chart-row">
+  <div class="chart-card">
+    <div class="chart-title">Chart A — Same-Store NOI Δ YoY Trajectory</div>
+    <div class="chart-subtitle">5 quarters · % change vs prior year · zero line solid · median dashed</div>
+    <div class="chart-canvas-wrap"><canvas id="chartA"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">Chart B — Same-Store Ending Occupancy</div>
+    <div class="chart-subtitle">5 quarters · % · 90% reference dashed</div>
+    <div class="chart-canvas-wrap"><canvas id="chartB"></canvas></div>
+  </div>
+</div>
+
+<div class="chart-row">
+  <div class="chart-card">
+    <div class="chart-title">Chart C — Revenue vs Expense Growth, Q1'26</div>
+    <div class="chart-subtitle">% YoY · negative bars = better expense control</div>
+    <div class="chart-canvas-wrap"><canvas id="chartC"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">Chart D — Cross-REIT Dispersion Over Time</div>
+    <div class="chart-subtitle">Range (high − low) across 5 REITs · falling = converging</div>
+    <div class="chart-canvas-wrap"><canvas id="chartD"></canvas></div>
+  </div>
+</div>
+
+<div class="chart-row-full">
+  <div class="chart-card">
+    <div class="chart-title">Chart E — Move-In Rate Δ vs Same-Store Revenue Δ, Q1'26</div>
+    <div class="chart-subtitle">Where each REIT's revenue growth is coming from: rate, occupancy, or ECRI</div>
+    <div class="chart-canvas-wrap" style="height: 320px;"><canvas id="chartE"></canvas></div>
+  </div>
+</div>
+
+<div class="legend">
+  <span><span class="legend-dot" style="background:var(--psa)"></span>PSA</span>
+  <span><span class="legend-dot" style="background:var(--exr)"></span>EXR</span>
+  <span><span class="legend-dot" style="background:var(--cube)"></span>CUBE</span>
+  <span><span class="legend-dot" style="background:var(--nsa)"></span>NSA</span>
+  <span><span class="legend-dot" style="background:var(--sma)"></span>SMA</span>
+  <span><span class="legend-dot" style="background:var(--median);border:1px solid var(--border2)"></span>Median (dashed)</span>
+</div>
+
+<div class="so-what">
+  <b>So What for ASSI</b>
+  The trajectory charts make one thing visually unmistakable — the sector inflection is real, broad, and accelerating. ASSI's 2026 rate posture should bias toward <i>holding</i> street rates and matching the institutional ECRI cadence; the rate-led revenue tailwind started at EXR/CUBE in Q3'25 and is now broad enough that NC submarkets should participate within 1–2 quarters.
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 3: DISPERSION & CONSENSUS
+══════════════════════════════════════════ -->
+<div class="section-header"><span>03</span> Cross-REIT Dispersion &amp; Consensus</div>
+
+<div class="table-block">
+  <div class="table-title">Direction consensus, Q1'26</div>
+  <table>
+    <thead>
+      <tr><th>Metric</th><th>Positive</th><th>Negative</th><th style="text-align:left">Call</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>SS Revenue Δ YoY</td><td class="pos">5 (all)</td><td>0</td><td style="text-align:left;color:var(--green)"><b>Consensus ↑</b></td></tr>
+      <tr><td>SS NOI Δ YoY</td><td class="pos">4 (PSA, EXR, NSA, SMA)</td><td>1 (CUBE)</td><td style="text-align:left;color:var(--green)"><b>Consensus ↑</b></td></tr>
+      <tr><td>Ending Occupancy QoQ</td><td class="pos">5 (all)</td><td>0</td><td style="text-align:left;color:var(--green)"><b>Consensus ↑</b></td></tr>
+      <tr><td>Move-in Rate Δ YoY</td><td>3 (EXR, CUBE, SMA/unit)</td><td>2 (PSA, SMA/SF)</td><td style="text-align:left;color:var(--text2)">Split</td></tr>
+      <tr><td>SS Opex Δ YoY (lower=positive)</td><td>2 favorable (PSA, NSA)</td><td>2 weather-blown (CUBE, EXR)</td><td style="text-align:left;color:var(--text2)">Split (weather noise)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="nc-grid">
+  <div class="nc-card">
+    <div class="nc-title">Where the sector is converging</div>
+    <div class="nc-body">Revenue. Q1'26 range of 1.7 pts is the second-tightest of the five quarters, well below Q1'25's 6.4-pt range. A single sector dynamic — supply moderation + demand stabilization + rate-floor reached — is doing the work. Portfolio composition matters less than it did 12 months ago.</div>
+  </div>
+  <div class="nc-card">
+    <div class="nc-title">Where the sector is diverging</div>
+    <div class="nc-body">Expense. Q1'26 range of 9.7 pts is the widest of any line item in any quarter in the window. Two stories: (1) weather randomness at CUBE/EXR (snow removal at CUBE alone = 120 bps), (2) genuine operating leverage at NSA, PSA, SMA. Expense discipline is now the differentiator.</div>
+  </div>
+</div>
+
+<div class="so-what">
+  <b>Outlier Spotlight</b>
+  NSA delivered the sector's best operating quarter in Q1'26 — +2.0% same-store NOI on −3.9% expenses, the best expense print in the sector — driven by (1) lapping 2024 PRO-consolidation costs, (2) marketing spend that drove +11% YoY move-in volume, and (3) sequential improvement in Atlanta and Phoenix. The irony: this is the operating story management promised for two years, finally delivered just as the company is being acquired by PSA. NSA's relevance to ASSI now is primarily as a benchmark for what disciplined cost control can deliver against a Sun Belt-weighted portfolio.
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 4: FORWARD GUIDANCE
+══════════════════════════════════════════ -->
+<div class="section-header"><span>04</span> 2026 Forward Guidance &amp; Tone</div>
+
+<div class="table-block">
+  <table>
+    <thead>
+      <tr><th>REIT</th><th style="text-align:left">SS Revenue</th><th style="text-align:left">SS Opex</th><th style="text-align:left">SS NOI</th><th style="text-align:left">Core FFO/sh</th><th style="text-align:left">Tone</th><th style="text-align:left">Action</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="psa-cell"><b>PSA</b></td>
+        <td style="text-align:left">−2.2% to 0.0% <span style="color:var(--text3)">(mid −1.1%)</span></td>
+        <td style="text-align:left">+1.5% to +2.8%</td>
+        <td style="text-align:left">−3.9% to −0.5% <span style="color:var(--text3)">(mid −2.2%)</span></td>
+        <td style="text-align:left">$16.35–$17.00 <span style="color:var(--text3)">(mid $16.68, −1.7% YoY)</span></td>
+        <td style="text-align:left"><span class="tag tag-caut">Cautious</span></td>
+        <td style="text-align:left;color:var(--text2);font-size:11px">Reaffirmed</td>
+      </tr>
+      <tr>
+        <td class="exr-cell"><b>EXR</b></td>
+        <td style="text-align:left">−0.5% to +1.5% <span style="color:var(--text3)">(mid +0.5%)</span></td>
+        <td style="text-align:left">+2.0% to +3.5%</td>
+        <td style="text-align:left">−2.25% to +1.25% <span style="color:var(--text3)">(mid −0.5%)</span></td>
+        <td style="text-align:left">$8.05–$8.35 <span style="color:var(--text3)">(mid $8.20, ~flat)</span></td>
+        <td style="text-align:left"><span class="tag tag-neut">Neutral</span></td>
+        <td style="text-align:left;color:var(--text2);font-size:11px">Reaffirmed (revisit Q2)</td>
+      </tr>
+      <tr>
+        <td class="cube-cell"><b>CUBE</b></td>
+        <td style="text-align:left">−0.25% to +1.25% <span style="color:var(--text3)">(mid +0.5%)</span></td>
+        <td style="text-align:left">+3.25% to +4.75%</td>
+        <td style="text-align:left">−1.75% to +0.25% <span style="color:var(--text3)">(mid −0.75%)</span></td>
+        <td style="text-align:left">$2.52–$2.60 FFO/sh adj</td>
+        <td style="text-align:left"><span class="tag tag-neut">Neutral</span></td>
+        <td style="text-align:left;color:var(--text2);font-size:11px">Reaffirmed</td>
+      </tr>
+      <tr>
+        <td class="nsa-cell"><b>NSA</b></td>
+        <td style="text-align:left;color:var(--text3)">Withdrawn — merger pending</td>
+        <td style="text-align:left;color:var(--text3)">—</td>
+        <td style="text-align:left;color:var(--text3)">—</td>
+        <td style="text-align:left;color:var(--text3)">—</td>
+        <td style="text-align:left"><span class="tag tag-na">N/A</span></td>
+        <td style="text-align:left;color:var(--text2);font-size:11px">Withdrew (Q3'26 close)</td>
+      </tr>
+      <tr>
+        <td class="sma-cell"><b>SMA</b></td>
+        <td style="text-align:left">−0.25% to +1.75% <span style="color:var(--text3)">(mid +0.75%)</span></td>
+        <td style="text-align:left">+1.75% to +3.75%</td>
+        <td style="text-align:left">Implied mid ~−0.25% <span style="color:var(--text3)">(raised from −0.4%)</span></td>
+        <td style="text-align:left">$1.94–$2.04 <span style="color:var(--text3)">(mid $1.99)</span></td>
+        <td style="text-align:left"><span class="tag tag-cons">Constructive</span></td>
+        <td style="text-align:left;color:var(--green);font-size:11px"><b>RAISED — only one</b></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="nc-grid">
+  <div class="nc-card">
+    <div class="nc-title">Sector consensus outlook</div>
+    <div class="nc-body">Revenue midpoints cluster +0.5% to +0.75% for EXR/CUBE/SMA; PSA still cautious at −1.1% (LA rent control drag, NSA integration excluded from guide). Most-constructive: <b style="color:var(--sma)">SMA</b> (raised). Most-cautious: <b style="color:var(--psa)">PSA</b>.</div>
+  </div>
+  <div class="nc-card">
+    <div class="nc-title">Mid-year softening expectation</div>
+    <div class="nc-body">All REITs assume revenue softens mid-year before re-improving in H2. PSA explicit: "revenue growth as a lagging indicator will soften mid-year." EXR will revisit at Q2. Don't expect linear acceleration through the year.</div>
+  </div>
+</div>
+
+<div class="so-what">
+  <b>So What for ASSI</b>
+  PSA's cautious midpoint (−1.1% revenue) is the most conservative anchor for 2026 budgeting; EXR's (+0.5%) is more realistic for a stabilized portfolio in a healthier Sun Belt submarket. ASSI's mature portfolio likely lands closer to EXR's outlook than PSA's. Telegraph the mid-year softening expectation to ownership now — Q1→Q2 sequentials may not show acceleration even though the underlying recovery is intact.
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 5: GUIDANCE ACCURACY
+══════════════════════════════════════════ -->
+<div class="section-header"><span>05</span> Guidance Accuracy — Two-Year Lookback</div>
+
+<div class="table-block">
+  <table>
+    <thead>
+      <tr><th>REIT</th><th>2024 Guide Mid</th><th>2024 Actual</th><th>2024 Score</th><th>2025 Guide Mid</th><th>2025 Actual</th><th>2025 Score</th><th style="text-align:left">Pattern</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="psa-cell"><b>PSA</b></td><td>~−1.0%</td><td>−1.0%</td><td>➖ Met</td><td>−0.25%</td><td>~−0.1%</td><td>➖ Met</td><td style="text-align:left;color:var(--green)"><b>Accurate</b></td></tr>
+      <tr><td class="exr-cell"><b>EXR</b></td><td>~+0.5%</td><td>−0.4%</td><td>❌ Missed (hard)</td><td>−0.25%</td><td>+0.4%</td><td>✅ Beat</td><td style="text-align:left;color:var(--amber)"><b>Volatile</b></td></tr>
+      <tr><td class="cube-cell"><b>CUBE</b></td><td>−0.5%</td><td>−1.3%</td><td>⚠️ Missed (soft)</td><td>−0.6%</td><td>−0.6%</td><td>➖ Met</td><td style="text-align:left;color:var(--text2)"><b>Improving / Cons.</b></td></tr>
+      <tr><td class="nsa-cell"><b>NSA</b></td><td>~−2.0%</td><td>−3.0%</td><td>⚠️ Missed (soft)</td><td>−2.5%</td><td>−2.4%</td><td>➖ Met</td><td style="text-align:left;color:var(--text2)"><b>Improving accuracy</b></td></tr>
+      <tr><td class="sma-cell"><b>SMA</b></td><td>+0.5%</td><td>+0.4%</td><td>➖ Met</td><td>+1.0%</td><td>+1.0%</td><td>➖ Met</td><td style="text-align:left;color:var(--green)"><b>Conservative; raises</b></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="so-what">
+  <b>So What for ASSI</b>
+  Anchor ASSI's 2026 budget closer to PSA's caution and SMA's mid-year revision pattern than to EXR's optimism. Defensible budget setup: SS revenue +0% to +1% for ASSI's mature pool (between PSA and CUBE midpoints), expense growth ~3% (sector median), remain prepared to revise upward at mid-year if Q2'26 prints confirm acceleration.
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 6: NC OPERATOR INTELLIGENCE
+══════════════════════════════════════════ -->
+<div class="section-header"><span>06</span> NC Operator Intelligence Brief</div>
+
+<div class="table-block">
+  <div class="table-title">6A. NC / Southeast market signals</div>
+  <div style="background:var(--bg2);padding:18px 22px;border-radius:6px;border:1px solid var(--border);color:var(--text2);font-size:13px;line-height:1.6;">
+    CUBE's CEO: "Our more stable urban markets in the Northeast and Midwest continue to outperform, while our more transient supply-impacted markets across the Sun Belt and the West Coast are beginning to see green shoots in the form of second-derivative improvement." EXR explicitly named <b style="color:var(--text1)">Atlanta, Austin, Dallas, Miami, and Phoenix</b> as continuing supply pressure. PSA: "Sun Belt supply pressures persisted" — coastal and Midwest outperformed. NSA: Atlanta and Phoenix the weakest revenue markets.<br/><br/>
+    <b style="color:var(--accent)">No REIT specifically named the Triangle, Charlotte, or Greensboro/High Point as either underperformers or outperformers.</b> The Carolinas continue to fly under the REIT problem-radar — a consistent pattern since 2023 and a constructive signal for ASSI's ownership narrative.
+  </div>
+</div>
+
+<div class="table-block">
+  <div class="table-title">6B. Supply pipeline watch — NC vs national</div>
+  <table>
+    <thead>
+      <tr><th>Market</th><th>2025 Delivered (sf)</th><th>% of Inventory</th><th>Avg Rent ($)</th><th style="text-align:left">Read</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><b>U.S. national</b></td><td>—</td><td>2.3% under-const.</td><td>$16.07/sf</td><td style="text-align:left;color:var(--text2)">Flat MoM; pipeline forecast revised up 6% May 20</td></tr>
+      <tr><td>Charlotte–Concord–Gastonia</td><td>776,800</td><td class="amber">3.5%</td><td>$119</td><td style="text-align:left;color:var(--text2)">Above-average growth; closer to Atlanta-Phoenix than to Midwest</td></tr>
+      <tr><td>Raleigh–Cary</td><td>385,800</td><td class="amber">3.3%</td><td>$119</td><td style="text-align:left;color:var(--text2)">Above-average but no REIT problem-callout</td></tr>
+      <tr><td>Elizabeth City, NC</td><td>265,900</td><td class="neg">48.6%</td><td>$141</td><td style="text-align:left;color:var(--text2)"><b>#1 metro in US</b> for rate of supply growth (extreme outlier)</td></tr>
+      <tr><td>EXR same-store: 2026 properties facing new supply</td><td colspan="2"><b>6% (down from 8% in 2025; high-20s% in 2021–23)</b></td><td>—</td><td style="text-align:left;color:var(--text2)">Supply pressure clearly moderating</td></tr>
+      <tr><td>Q1'26 national construction starts</td><td colspan="2"><b class="pos">−29% YoY</b></td><td>—</td><td style="text-align:left;color:var(--text2)">"2025's decline continuing into 2026" (Yardi)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="table-block">
+  <div class="table-title">ASSI submarket mapping</div>
+  <div class="nc-grid">
+    <div class="nc-card">
+      <div class="nc-title">Johnston County (Clayton, Angier)</div>
+      <div class="nc-body">Raleigh-Cary MSA. 3.3% 2025 supply growth above national but well below Atlanta-Phoenix pressure zones. Inflow moderating. REIT silence on Triangle-specific stress is the strongest signal — if PSA/EXR were seeing material Triangle softness, they would have mentioned it.</div>
+    </div>
+    <div class="nc-card">
+      <div class="nc-title">Wake County suburbs (Fuquay-Varina, Knightdale)</div>
+      <div class="nc-body">Same Raleigh-Cary MSA dynamics. Sub-MSA / exurban location should perform at-or-better than the MSA blended figure — new development is more capital-intensive at the outer ring.</div>
+    </div>
+    <div class="nc-card">
+      <div class="nc-title">Chatham County (Pittsboro)</div>
+      <div class="nc-body">Smaller market, less REIT data. Trajectory most tied to Triangle spillover plus the Chatham Park / VinFast development corridor; structurally constructive demand backdrop.</div>
+    </div>
+    <div class="nc-card">
+      <div class="nc-title">Cabarrus County (Concord)</div>
+      <div class="nc-body" style="color:#ffb89c">Charlotte–Concord–Gastonia MSA (3.5% supply growth, highest NC top metro). <b>Remains ASSI's highest market-risk facility for 2026.</b> Charlotte rent decline noted by REITs but not as severe as Atlanta/Phoenix. Watch facility-level competitor count, not just MSA averages.</div>
+    </div>
+    <div class="nc-card" style="grid-column: span 2;">
+      <div class="nc-title">Triad / High Point / Greensboro</div>
+      <div class="nc-body">Internally flagged by ASSI as highest oversupply risk. <b style="color:var(--text1)">No REIT explicitly corroborated</b> Triad as a problem market in Q1'26. Either ASSI's internal flag is conservative relative to the REITs, or REIT data is too coarse to catch a Triad-specific issue. Recommend a Yardi sub-MSA pull on Greensboro-High Point to validate or relax this flag against ASSI facility-level rate data for the next ownership check-in.</div>
+    </div>
+  </div>
+</div>
+
+<div class="table-block">
+  <div class="table-title">6D. Technology &amp; operational practices worth adopting</div>
+  <div style="background:var(--bg2);padding:6px 22px;border-radius:6px;border:1px solid var(--border);">
+    <div class="tech-row">
+      <div class="tech-num">01</div>
+      <div>
+        <div class="tech-name">AI-driven pricing &amp; customer interaction</div>
+        <div class="tech-body">PSA's PSNext: 85%+ of customer interactions via self-service digital; explicit data science / ML / AI pricing. EXR's Onity smart locks. CUBE using LLMs in digital marketing. <b style="color:var(--text1)">ASSI gap:</b> ASSI is ahead on the AI-tool stack Adam has built; the next frontier is model-based daily rate engines.</div>
+      </div>
+      <div class="tech-flag"><span class="tag tag-rel">🟡 Relevant</span></div>
+    </div>
+    <div class="tech-row">
+      <div class="tech-num">02</div>
+      <div>
+        <div class="tech-name">Centralized call center / virtual property management</div>
+        <div class="tech-body">PSA: 30%+ reduction in on-site labor hours via digital. EXR: 1,916 managed stores. SMA: managed REIT platform $16M annualized. <b style="color:var(--text1)">ASSI gap:</b> 20-facility scale justifies a centralized call center model; quantify current per-facility labor hours to build the ROI case.</div>
+      </div>
+      <div class="tech-flag"><span class="tag tag-rel">🟡 Relevant</span></div>
+    </div>
+    <div class="tech-row">
+      <div class="tech-num">03</div>
+      <div>
+        <div class="tech-name">Third-party management platform expansion</div>
+        <div class="tech-body">EXR (1,916), CUBE (854), SMA (220+ from Argus), NSA via SAM. <b style="color:var(--text1)">ASSI opportunity:</b> ASSI's operational tech stack (gate monitoring, protection plan, tenant auditing) is institutional-grade. A 5–10 facility 3PM book at 6% of gross revenue (Blue Door / SAM model) scales the platform without acquisition capital. Storage Rebellion network is the obvious origination channel.</div>
+      </div>
+      <div class="tech-flag"><span class="tag tag-act">🟢 Act Now</span></div>
+    </div>
+    <div class="tech-row">
+      <div class="tech-num">04</div>
+      <div>
+        <div class="tech-name">ECRI cadence &amp; customer retention</div>
+        <div class="tech-body">EXR Q1'26: 64% of customers stay &gt;12mo (up 167 bps YoY), 46% &gt;24mo (up 190 bps). PSA: material churn reduction. <b style="color:var(--text1)">ASSI action:</b> match institutional ECRI cadence — typically 6-month cycles with selective 8–15% increases. Highest-ROI revenue lever ASSI controls. Benchmark ASSI's tenancy metrics against EXR's disclosed numbers.</div>
+      </div>
+      <div class="tech-flag"><span class="tag tag-act">🟢 Act Now</span></div>
+    </div>
+    <div class="tech-row">
+      <div class="tech-num">05</div>
+      <div>
+        <div class="tech-name">Bridge lending / ancillary capital deployment</div>
+        <div class="tech-body">EXR $1.5B portfolio; SMA new JV with Axxess Capital, $100M opportunities at 10–14% yields. <b style="color:var(--text1)">ASSI read:</b> REITs are choosing 10–14% lending yields over 5% acquisitions. ASSI's underwriting discipline (no acquisitions above cost-of-capital threshold) is aligned with institutional behavior.</div>
+      </div>
+      <div class="tech-flag"><span class="tag tag-watch">🔴 Watch</span></div>
+    </div>
+    <div class="tech-row">
+      <div class="tech-num">06</div>
+      <div>
+        <div class="tech-name">Tenant protection plan / ancillary revenue penetration</div>
+        <div class="tech-body">EXR tenant insurance +5% YoY Q1'26; CUBE expanding. <b style="color:var(--text1)">ASSI action:</b> ASSI already runs protection plan administration. Next layer is per-tenant attach rates — protection plan, retail at move-in, late-stage value-adds. Benchmark ASSI's attach rate vs EXR.</div>
+      </div>
+      <div class="tech-flag"><span class="tag tag-rel">🟡 Relevant</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="table-block">
+  <div class="table-title">6E. Rate &amp; pricing intelligence</div>
+  <div style="background:var(--bg2);padding:18px 22px;border-radius:6px;border:1px solid var(--border);color:var(--text2);font-size:13px;line-height:1.6;">
+    Competition for move-ins remains intense but the rate floor has been found and rate-side momentum is building. EXR delivered +2.5%/sf new-customer rate growth in Q1; CUBE +2.0% March/April; SMA +2% per-unit. PSA still negative (−2.4%) but improving. NSA RevPAR +0.6%.<br/><br/>
+    <b style="color:var(--text1)">ASSI rental-season posture:</b>
+    <ul style="margin-top:8px; margin-left:18px; line-height:1.7;">
+      <li><b style="color:var(--text1)">Web/street rates:</b> sticky-to-slightly-up YoY. REIT consensus: the rate-cutting era is over.</li>
+      <li><b style="color:var(--text1)">Achieved move-in rates:</b> hold published rates; let competitive pressure show up through promotions rather than rate cuts.</li>
+      <li><b style="color:var(--text1)">ECRI:</b> match institutional cadence — EXR's published retention data supports rate elasticity at the existing-customer level.</li>
+      <li><b style="color:var(--text1)">Concession philosophy:</b> SMA's gap (−7%/sf achieved vs +2%/unit) is the clearest tell — discount layer is doing the work, not headline rate cuts. ASSI published rates can hold; concession line is where competition shows up.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="so-what">
+  <b>So What for ASSI (overall)</b>
+  The Q1'26 tape is the best moment in two-plus years to tell the ASSI ownership story as: <b>(1)</b> the sector has clearly inflected positive — every REIT now positive on revenue, four of five positive on NOI; <b>(2)</b> ASSI's NC submarkets are not in the REIT problem-radar; <b>(3)</b> expense control is the next differentiator and ASSI's tech stack supports that thesis; <b>(4)</b> 2026 budget anchor: PSA caution (−1.1% SS rev) calibrated upward toward EXR neutrality (+0.5%) given ASSI's Triangle exposure.
+</div>
+
+<footer>
+  <b>Prepared 2026-05-21.</b><br/>
+  <b>Sources:</b> SkyView Advisors Q1 2025, Q3 2025, Q4 2025, and Q1 2026 self-storage industry reports; SEC EDGAR 8-K and 10-Q filings (PSA, EXR, CUBE, NSA, SMA Q1 2026); Inside Self Storage Q2 2025 / Q4 2025 / Q1 2026 REIT recaps; Yardi Matrix Self Storage National Reports (Jan–Apr 2026) + Q2 2026 Supply Forecast Update (May 20, 2026); StorageCafe 2025 supply-growth metro ranking; Motley Fool / Investing.com / Benzinga / Globe and Mail / Stocktitan earnings call transcripts (PSA, EXR, CUBE, SMA Q1 2026); SmartStop investor presentation peer-comp deck (Q1 2025).
+</footer>
+
+<script>
+// Chart.js global defaults
+Chart.defaults.color = '#a6acbb';
+Chart.defaults.font.family = "'IBM Plex Mono', monospace";
+Chart.defaults.font.size = 10;
+Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+
+const colors = {
+  psa: '#4e9af1', exr: '#f5a623', cube: '#7ed321',
+  nsa: '#9b59b6', sma: '#e74c3c', median: '#ffffff'
+};
+
+const quarters = ["Q1'25","Q2'25","Q3'25","Q4'25","Q1'26"];
+
+// Chart A — NOI trajectory
+new Chart(document.getElementById('chartA'), {
+  type: 'line',
+  data: {
+    labels: quarters,
+    datasets: [
+      {label:'PSA', data:[0.0,-1.6,0.2,-1.2,0.5], borderColor:colors.psa, backgroundColor:colors.psa, tension:0.25, borderWidth:2, pointRadius:3},
+      {label:'EXR', data:[-1.2,-1.1,-2.5,0.1,1.2], borderColor:colors.exr, backgroundColor:colors.exr, tension:0.25, borderWidth:2, pointRadius:3},
+      {label:'CUBE', data:[-0.8,-1.1,-1.5,-1.1,-1.5], borderColor:colors.cube, backgroundColor:colors.cube, tension:0.25, borderWidth:2, pointRadius:3},
+      {label:'NSA', data:[-5.7,-5.6,-5.7,-0.7,2.0], borderColor:colors.nsa, backgroundColor:colors.nsa, tension:0.25, borderWidth:2, pointRadius:3},
+      {label:'SMA', data:[2.3,-1.1,1.5,-0.3,2.0], borderColor:colors.sma, backgroundColor:colors.sma, tension:0.25, borderWidth:2, pointRadius:3},
+      {label:'Median', data:[-0.8,-1.1,-1.5,-0.7,1.2], borderColor:colors.median, borderDash:[4,3], borderWidth:1.5, pointRadius:0, tension:0.25}
+    ]
+  },
+  options: {
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { ticks: { callback: v => v + '%' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+      x: { grid: { display: false } }
+    },
+    elements: { line: { tension: 0.3 } }
+  }
+});
+
+// Chart B — Occupancy
+new Chart(document.getElementById('chartB'), {
+  type: 'line',
+  data: {
+    labels: quarters,
+    datasets: [
+      {label:'PSA', data:[91.5,92.7,90.7,91.0,91.3], borderColor:colors.psa, tension:0.25, borderWidth:2, pointRadius:3},
+      {label:'EXR', data:[93.4,94.6,93.7,92.6,93.0], borderColor:colors.exr, tension:0.25, borderWidth:2, pointRadius:3},
+      {label:'CUBE', data:[89.7,91.1,89.0,88.6,89.3], borderColor:colors.cube, tension:0.25, borderWidth:2, pointRadius:3},
+      {label:'NSA', data:[83.6,85.0,84.5,84.0,84.5], borderColor:colors.nsa, tension:0.25, borderWidth:2, pointRadius:3},
+      {label:'SMA', data:[93.0,93.0,92.4,92.1,92.3], borderColor:colors.sma, tension:0.25, borderWidth:2, pointRadius:3},
+      {label:'90% ref', data:[90,90,90,90,90], borderColor:'rgba(255,255,255,0.25)', borderDash:[4,4], borderWidth:1, pointRadius:0}
+    ]
+  },
+  options: {
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { min: 82, max: 96, ticks: { callback: v => v + '%' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// Chart C — Revenue vs Expense Q1'26
+new Chart(document.getElementById('chartC'), {
+  type: 'bar',
+  data: {
+    labels: ['PSA','EXR','CUBE','NSA','SMA'],
+    datasets: [
+      {label:'SS Revenue Δ', data:[0.1, 1.8, 0.6, 0.9, 1.5], backgroundColor:'rgba(245,166,35,0.85)', borderRadius:3},
+      {label:'SS Expense Δ', data:[-1.6, 2.7, 5.8, -3.9, 0.6], backgroundColor:'rgba(166,172,187,0.45)', borderRadius:3}
+    ]
+  },
+  options: {
+    plugins: {
+      legend: { display: true, position: 'bottom', labels: { boxWidth: 10, padding: 12, font: { size: 10 } } },
+      tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y + '%' } }
+    },
+    scales: {
+      y: { ticks: { callback: v => v + '%' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// Chart D — Dispersion
+new Chart(document.getElementById('chartD'), {
+  type: 'line',
+  data: {
+    labels: quarters,
+    datasets: [
+      {label:'SS Revenue range', data:[6.4,3.5,4.7,1.1,1.7], borderColor:colors.exr, backgroundColor:'rgba(245,166,35,0.1)', fill:true, tension:0.25, borderWidth:2, pointRadius:3},
+      {label:'SS NOI range', data:[8.0,4.5,7.2,1.3,3.5], borderColor:colors.sma, tension:0.25, borderWidth:2, pointRadius:3},
+      {label:'Occupancy range', data:[9.8,9.6,9.2,8.6,8.5], borderColor:colors.psa, tension:0.25, borderWidth:2, pointRadius:3}
+    ]
+  },
+  options: {
+    plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: 10, padding: 12, font: { size: 10 } } } },
+    scales: {
+      y: { ticks: { callback: v => v + ' pts' }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// Chart E — Scatter: move-in rate vs revenue growth (Q1'26)
+new Chart(document.getElementById('chartE'), {
+  type: 'scatter',
+  data: {
+    datasets: [
+      {label:'PSA',  data:[{x:-2.4, y:0.1}], backgroundColor:colors.psa,  pointRadius:9, borderColor:'#fff', borderWidth:1.5},
+      {label:'EXR',  data:[{x: 2.5, y:1.8}], backgroundColor:colors.exr,  pointRadius:9, borderColor:'#fff', borderWidth:1.5},
+      {label:'CUBE', data:[{x: 2.0, y:0.6}], backgroundColor:colors.cube, pointRadius:9, borderColor:'#fff', borderWidth:1.5},
+      {label:'NSA',  data:[{x: 0.6, y:0.9}], backgroundColor:colors.nsa,  pointRadius:9, borderColor:'#fff', borderWidth:1.5},
+      {label:'SMA',  data:[{x: 2.0, y:1.5}], backgroundColor:colors.sma,  pointRadius:9, borderColor:'#fff', borderWidth:1.5}
+    ]
+  },
+  options: {
+    plugins: {
+      legend: { display: true, position: 'bottom', labels: { boxWidth: 8, padding: 14, font: { size: 11, weight: 500 } } },
+      tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: move-in ${ctx.parsed.x}%, rev ${ctx.parsed.y}%` } }
+    },
+    scales: {
+      x: { title: { display: true, text: 'Move-in rate Δ YoY (%)', color: '#a6acbb', font: { size: 10 } }, ticks: { callback: v => v + '%' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+      y: { title: { display: true, text: 'SS Revenue Δ YoY (%)', color: '#a6acbb', font: { size: 10 } }, ticks: { callback: v => v + '%' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+    }
+  }
+});
+</script>
+
+</body>
+</html>
